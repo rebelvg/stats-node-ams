@@ -4,7 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "docker": "docker-compose up -d && yarn install-app",
+    "docker": "docker-compose up -d && yarn remove-app && yarn install-app",
+    "remove-app": "docker exec ams rm -rf /opt/adobe/ams/applications/live",
     "install-app": "docker cp ams_app/live ams:/opt/adobe/ams/applications"
   }
 }
