@@ -8,3 +8,5 @@ services:
       - 1935:1935
       - 1111:1111
       - 8080:80
+    volumes:
+      - ./applications:/opt/adobe/ams/applications
