@@ -1,0 +1,9 @@
+version: '3.7'
+
+services:
+  ams:
+    image: flexconstructor/docker-adobe-media-server
+    container_name: ams
+    ports:
+      - 1935:1935
+      - 1111:1111
