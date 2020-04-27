@@ -1,3 +1,5 @@
+node_modules/
 applications/live/bans/
 applications/live/clients/
 applications/live/streams/
+config.ts
