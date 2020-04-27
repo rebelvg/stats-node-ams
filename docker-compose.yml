@@ -9,4 +9,9 @@ services:
       - 1111:1111
       - 8080:80
     volumes:
+      - amsdata:/opt/adobe/ams
       - ./applications:/opt/adobe/ams/applications
+      - ./conf:/opt/adobe/ams/conf
+
+volumes:
+  amsdata:

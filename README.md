@@ -19,6 +19,7 @@ Statistics server/API counterpart for stats-node specifically designed for Adobe
 ### Run
 
 ```
+yarn docker
 yarn install
 yarn start
 ```

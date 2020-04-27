@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "docker": "docker-compose up -d",
-    "start": "ts-node api/index.ts"
+    "docker": "docker-compose up -d && yarn copy-video-player",
+    "start": "ts-node api/index.ts",
+    "copy-video-player": "docker exec ams cp -a /opt/adobe/ams/samples/videoPlayer /opt/adobe/ams/webroot"
   },
   "devDependencies": {
     "@types/koa": "^2.0.48",

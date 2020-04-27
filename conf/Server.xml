@@ -1,0 +1,904 @@
+<Root>
+	<!-- This section contains information for configuring the server. -->
+	<Server>
+		<!-- Enables or disables IP version 6.      -->
+		<!-- Operating system network stack should be configured to support IPV6 to make this happend.   -->
+		<!-- AMS automatically detects operating system configuration and this key can force AMS to use IPv4 in case of IPv6 is available. -->
+		<NetworkingIPv6 enable="false" />
+
+		<!-- Whether the Edge server should respond to an crossdomain.xml request from a client. -->
+		<!-- This specifies the absolute path of the file where the      -->
+		<!-- server looks for respond context. By default, respond is *. -->
+		<CrossDomainPath></CrossDomainPath>
+
+		<!-- This section configures present server plugins located at    		-->
+  		<!-- AMS/modules/ folder to receive certain file operations.		    -->
+		<Plugins>
+			<!-- This section configures the user defined data   	          -->
+			<!-- retrived by plugins with specified key    	                  -->
+			<UserDefined>
+				<UserKey1>
+          				This data can be retrieved by AMS plug-in.
+          				Please look at Auth Adaptor sample for details.
+				</UserKey1>
+        			<UserKey2>
+          				This data can be retrieved by AMS plug-in.
+          				Please look at Auth Adaptor sample for details.
+        			</UserKey2>
+      			</UserDefined>
+  			<!-- This section configures the present file plugin located at	  -->
+  			<!-- AMS/modules/fileio folder to receive certain file operations.-->
+  			<!-- To disable plugin, set the "enabled" attribute to false.		  -->
+  			<!-- You do not need to remove plugin from assigned folder.	  -->
+  			<!-- By default, if adaptor is present, only stream file		  -->
+  			<!-- operations are routed to it.				  -->
+  			<FilePlugin enabled="true">
+     				<!-- Maximum number of pending/outstanding requests to    -->
+				    <!-- control adaptor. Default is 0 unlimited.                 -->
+     				<MaxNumberOfRequests>0</MaxNumberOfRequests>
+				    <!-- This section configures stream file operations in	      -->
+     				<!-- present plugin. By default such operations enabled	  -->
+				    <!-- and will be managed by this plugin. 	                    -->
+     				<Content type="Streams">true</Content>
+     				<!-- This section configures SWF verification file		    -->
+     				<!-- operations  in present plugin. By default such	      -->
+				    <!-- operations won't be managed by this plugin.	            -->
+				    <Content type="SWF">false</Content>
+            <!-- This section configures PRTMP common key and file		  -->
+            <!-- whitelist file operations  in present plugin. By 	    -->
+            <!-- default such operations won't be managed by this 	    -->
+            <!-- plugin.                                                -->
+            <Content type="PRTMP">false</Content>
+  			</FilePlugin>
+		</Plugins>
+
+
+
+		<!-- This sections contains SSL configuration information.     -->
+		<SSL>
+			<!-- Specify the number of bytes of entropy to use for     -->
+			<!-- seeding the PRNG. You cannot specify anything less    -->
+			<!-- than 8 bytes, and the default is 16. Entropy is a     -->
+			<!-- measure of randomness. The more entropy, the more     -->
+			<!-- random numbers from the PRNG will be.                 -->
+			<SSLRandomSeed>16</SSLRandomSeed>
+
+			<!-- Specifies how often to flush expired sessions from    -->
+			<!-- server-side session cache.                            -->
+			<SSLSessionCacheGC>5</SSLSessionCacheGC>
+
+			<!-- The following section configures the server to act as an  -->
+			<!-- SSL client (out-going SSL connections).			       -->
+			<SSLClientCtx>
+
+				<!-- This specifies whether or not to verify the cert that -->
+				<!-- is returned by the server being connected to. Cert    -->
+				<!-- verification is enabled by default. To disable cert   -->
+				<!-- verification, specify false.                          -->
+				<!-- WARNING!!! Disabling certificate verification can     -->
+				<!-- result in a security hazard. Please be sure you know  -->
+				<!-- what you are doing if you wish to disable this.       -->
+				<SSLVerifyCertificate>true</SSLVerifyCertificate>
+
+				<!-- Specifies the name of a directory containing CA       -->
+				<!-- certificates. Each file in the directory must contain -->
+				<!-- only a single CA certificate, and the files must be   -->
+				<!-- named by the subject name's hash, and an extension of -->
+				<!-- ".0".                                                 -->
+				<!-- Win32 Only: If this tag is empty, we will attempt to  -->
+				<!-- find CA certs in the "certs" directory located at the -->
+				<!-- same level as the "conf" directory. The Windows cert  -->
+				<!-- store can be imported into this directory by running  -->
+				<!-- AMSMaster -console -initialize from the command line. -->
+				<SSLCACertificatePath></SSLCACertificatePath>
+
+				<!-- Specifies the name of a file containing one or more   -->
+				<!-- CA certificates in PEM format.                        -->
+				<SSLCACertificateFile></SSLCACertificateFile>
+
+				<!-- Specifies the maximum depth of the certificate chain  -->
+				<!-- we are willing to accept. If a self-signed root cert  -->
+				<!-- cannot be found within this depth, cert verification  -->
+				<!-- will fail. Default is 9.                              -->
+				<SSLVerifyDepth>9</SSLVerifyDepth>
+
+				<!-- Specifies the ciphers to use. This ia a list of colon delimited  -->
+				<!-- components. A component can be a key exchange algorithm,         -->
+				<!-- authentication method, encryption method, digest type, or one of -->
+				<!-- a selected number of aliases for common groupings. For a list of -->
+				<!-- components, please refer to the AMS documentation. Do not change -->
+				<!-- the default settings unless you know what you are doing.         -->
+				<SSLCipherSuite>ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH</SSLCipherSuite>
+
+			</SSLClientCtx>
+		</SSL>
+
+		<!-- Configures UID and GID for all the server processes       -->
+		<!-- In unix, all the server processes will switch from root   -->
+		<!-- to the UID and GID specified in this section for security -->
+		<!-- reason.  If no UID and GID are specified, the server      -->
+		<!-- will be running as root.                                  -->
+		<Process>
+			<!-- Process user ID (unix only) -->
+			<UID>${SERVER.PROCESS_UID}</UID>
+			<!-- Process group ID (unix only) -->
+			<GID>${SERVER.PROCESS_GID}</GID>
+		</Process>
+
+		<!-- This key controls who has read/write access to the shared object   -->
+		<!-- files and stream files in the server. The Mask is used by umask    -->
+		<!-- to set file creation mask.  By default, the mask is set to 017     -->
+		<!-- and the files are created with permission 0666.                    -->
+		<!-- 0666 & ~017 = 0660 = r w - r w - - - -, that means the owner of    -->
+		<!-- the server and all the users belonging to the same group as the    -->
+		<!-- owner will have read/write access to the files. This mask must be  -->
+		<!-- a 3 digit octal format                                             -->
+		<!-- This config node is for unix only.                                 -->
+		<Mask>017</Mask>
+
+		<!-- This key contains information related to the licensing of -->
+		<!-- the server, such as how many connections are allowed, and -->
+		<!-- various other things in the server license.               -->
+		<LicenseInfo>${SERVER.LICENSEINFO}</LicenseInfo>
+
+                <!-- All license keys added or removed using admin console is inserted in this tag -->
+                <LicenseInfoEx></LicenseInfoEx>
+
+    <!-- Configures the largest I/O read buffers that the server will use. -->
+    <!-- Larger buffers may give better performance for some uses, but at  -->
+    <!-- the cost of higher memory usage.                                  -->
+    <ReadBufferSize>4096</ReadBufferSize>
+
+
+    <Security>
+
+      <!-- Enables virtual directory mappings for file objects in the script. -->
+      <!-- This is disabled by default.										 -->
+      <VirtualDirectoryForFile enable="false"></VirtualDirectoryForFile>
+
+
+	  <!-- Defines the maximum allowed rtmp and swf url length(in bytes). -->
+      <!-- Default value is 32 KB.                                        -->
+	  <MaxUrlLength></MaxUrlLength>
+
+      <!-- Configures the number of failed admin login attempts and the recovery time.-->
+      <LoginLimits>
+        <!-- Configures the maximum number of login failures before having to wait to be allowed again.-->
+        <MaxFailures>3</MaxFailures>
+        <!-- Configures the time to wait in seconds before allowing another login attempt -->
+        <!-- after it has reached max failures.                                           -->
+        <RecoveryTime>30</RecoveryTime>
+        <!-- Configures the max admin login failures before lockout.AMSAdmin will have to be restarted -->
+        <!-- after this lockout in order to allow that user to login again.                            -->
+        <LockoutLimit>300</LockoutLimit>
+      </LoginLimits>
+
+
+    </Security>
+
+		<!-- Configures Flash Media Admin Server -->
+		<AdminServer>
+			<!-- Whether the Admin server should respond to an crossdomain.xml request from a client. -->
+			<!-- This specifies the absolute path of the file where the      -->
+			<!-- server looks for respond context. By default, respond is *. -->
+			<CrossDomainPath></CrossDomainPath>
+
+			<!-- Details and configurations for different versions of RTMP		-->
+			<RTMP>
+				<!-- RTMPE is the encrypted RTMP protocol covering both RTMPE and RTMPTE -->
+				<!-- This is enabled by default, setting enabled to "false will not	 -->
+				<!-- allow these protocols on this adaptor				 -->
+				<RTMPE enabled="true"></RTMPE>
+			</RTMP>
+
+			<!-- Specifies IP address and port to bind to. The format  -->
+			<!-- is [<ip>][:<port>]. The default is to bind to "any"   -->
+			<!-- available IP on port 1111.                            -->
+			<HostPort>${SERVER.ADMINSERVER_HOSTPORT}</HostPort>
+			<!-- Specifies the interface and port to listen on internally -->
+			<!-- for connections from amscore process.                    -->
+			<IpcHostPort>localhost:11110</IpcHostPort>
+			<!-- Specifies how often (in sec.) to check for inactive sockets. -->
+			<SocketGC>60</SocketGC>
+
+			<!-- Configures UID and GID for the admin server                          -->
+			<!-- In unix, all the admin server processes will switch from root        -->
+			<!-- to the UID and GID specified in this section for security reason.    -->
+			<!-- If no UID and GID are specified, the server will be running as root. -->
+			<Process>
+				<!-- Process user ID (unix only) -->
+				<UID>${SERVER.PROCESS_UID}</UID>
+				<!-- Process group ID (unix only) -->
+				<GID>${SERVER.PROCESS_GID}</GID>
+			</Process>
+			<!-- to display <elem name="x"> instead of <_x> in the http command -->
+			<AdminElem>false</AdminElem>
+
+			<!-- This tag specifies to which admin connections we respond to.-->
+			<!-- This is specified as a comma delimited list of              -->
+			<!-- hostnames, domain names, and full or partial ip address, as -->
+			<!-- well as the keyword "all" (no quotes required).             -->
+			<!-- For example:                                                -->
+			<!-- <Allow>x.foo.com, foo.com, 10.60.1.133, 10.60</Allow> or    -->
+			<!-- <Allow>all</Allow>                                          -->
+			<Allow>all</Allow>
+
+			<!-- This tag specifies to which admin connections not to        -->
+			<!-- respond to. This is specified as a comma delimited list     -->
+			<!-- of hostnames, domain names, and full or partial ip address, -->
+			<!-- as well as the keyword "all" (no quotes required).          -->
+			<!-- For example:                                                -->
+			<!-- <Deny>x.foo.com, foo.com, 10.60.1.133, 10.60</Deny> or      -->
+			<!-- <Deny>all</Deny>                                            -->
+			<Deny></Deny>
+
+			<!-- Specifies the order to evaluate the Allow/Deny tags. This   -->
+			<!-- can be <Order>Deny,Allow</Order>, which means the request   -->
+			<!-- will be processed if not in <Deny> or in <Allow>. Or it can -->
+			<!-- be <Order>Allow,Deny</Order>, which means the request will  -->
+			<!-- be processed if in <Allow> and not in <Deny>.               -->
+			<Order>Allow,Deny</Order>
+
+		</AdminServer>
+
+		<!-- Configures automatic disconnecting of idle clients. A client is -->
+		<!-- idle if it has not sent or received any application data for    -->
+		<!-- some time. Application data does not include low level control  -->
+		<!-- msgs such as the built-in server ping mechanism. This is meant  -->
+		<!-- to clean up clients that, for example, are not playing or not   -->
+		<!-- publishing a stream, etc. To enable this feature, set the       -->
+		<!-- enable attribute to true. It is disabled by default. This can   -->
+		<!-- be overridden on a per-vhost basis. However, if disabled here,  -->
+		<!-- it is disabled for all vhosts. But if enabled here, vhosts can  -->
+		<!-- override it and disable it for that vhost. Vhosts can also      -->
+		<!-- override the max idle time (for that vhost only).               -->
+		<!-- <CheckInterval> is not overridable and applies to all vhosts.   -->
+		<AutoCloseIdleClients enable="false">
+			<!-- How often to check for idle clients. Specified in seconds. -->
+			<!-- Default is to check every 60 sec. (1 min)                  -->
+			<CheckInterval>60</CheckInterval>
+			<!-- How long a client can be idle before it is disconnected. -->
+			<!-- Specified in seconds. Default is 3600 sec. (1 hr)        -->
+			<MaxIdleTime>3600</MaxIdleTime>
+		</AutoCloseIdleClients>
+
+		<!-- Specifies max resource limits for the server. -->
+		<ResourceLimits>
+			<!-- Specifies how often (in minutes) to remove unused files from   -->
+			<!-- the cache. Specified in minutes. Default is 60 min.            -->
+			<FLVCachePurge>60</FLVCachePurge>
+			<FLVCache>
+				<FileCheckInterval>120</FileCheckInterval>
+				<!-- The maximum size of the FLV cache, in megabytes. -->
+				<!-- The default is 500MB. -->
+				<MaxSize>${SERVER.FLVCACHE_MAXSIZE}</MaxSize>
+				<!-- The maximum number of keyframes per FLV file in cache.  The      -->
+				<!-- cache is used to save the keyframes that are being generated     -->
+				<!-- in the server when enhanced seeking is enabled.                  -->
+				<!-- Default is 0 keyframe.                                           -->
+				<MaxKeyframeCacheSize>0</MaxKeyframeCacheSize>
+				<!-- When recording, determines whether non-key video frames that     -->
+				<!-- arrive without a corresponding video key frame are filtered or   -->
+				<!-- or sent to the stream module to be recorded. Default is false,   -->
+				<!-- meaning the non-key frames are sent to the stream module.        -->
+				<FilterNonKeyFrames>false</FilterNonKeyFrames>
+			</FLVCache>
+			<!-- Configures buffer for FLV recording -->
+			<RecBuffer>
+				<!-- Maximum number of seconds to wait before flushing the rec buffer.-->
+				<!-- Lower values enable users to watch the recording with a lower    -->
+				<!-- latency relative to live, but at the cost of higher disk usage.  -->
+				<!-- Default is 5 seconds, minimum is 1 second                        -->
+				<MaxFlushTime>5</MaxFlushTime>
+				<!-- Maximum number of kilobytes to accumulate before flushing the    -->
+				<!-- rec buffer.  Lower values enable users to watch the recording    -->
+				<!-- with a lower latency relative to live, but at the cost of higher -->
+				<!-- disk usage. Default is 256 KB, minimum is 32 KB                  -->
+				<MaxFlushSize>256</MaxFlushSize>
+				<!-- Number of milliseconds to hold audio messages in the rec buffer  -->
+				<!-- while waiting for a video message.  This allows for sorting of   -->
+				<!-- timestamps before flushing to disk in case video is delayed.     -->
+				<!-- By default this is blank, allowing AMS to automatically configure-->
+				<!-- the lag to match the publishers buffer, eliminating A/V glitches -->
+				<AllowedVideoLag></AllowedVideoLag>
+				<!-- Absolute maximum size of the rec buffer, in kilobytes.  This is  -->
+				<!-- intended as a safety net against AllowedVideoLag.  Default 5 MB. -->
+				<MaxSize>5120</MaxSize>
+				<!-- Maximum gap between 2 adjacent messages when comparing the       -->
+				<!-- message timestamps with the real time.  Server logs a warning    -->
+				<!-- when the timestamps between 2 adjacent messages is bigger than   -->
+				<!-- the difference in real time + MaxTimestampSkew.                  -->
+				<!-- MaxTimestampSkew is in millisecond and is disabled by default    -->
+				<!-- To enable the warning, set value to positive value               -->
+				<MaxTimestampSkew>-1</MaxTimestampSkew>
+			</RecBuffer>
+			<!-- Monitor CPU usage every N seconds. -->
+			<CPUMonitor>1</CPUMonitor>
+			<!-- GC unused I/O threads every N minutes. -->
+			<ThreadPoolGC>20</ThreadPoolGC>
+			<!-- GC global msg pool ever N seconds. -->
+			<MsgPoolGC>60</MsgPoolGC>
+			<!-- GC unused applications every N minutes. -->
+			<ApplicationGC>5</ApplicationGC>
+			<!-- MAX FLV cache size : specified in percent of total physical memory on the system. -->
+			<FLVCacheSize>10</FLVCacheSize>
+			<!-- Specifies how often (in sec.) to check for inactive sockets. -->
+			<SocketGC>60</SocketGC>
+
+			<!-- Monitoring interval for process virtual memory use (in sec.)      -->
+			<ProcVMSizeMonitorInterval>60</ProcVMSizeMonitorInterval>
+ 			<!-- Log warning threshold for "high" process virtual memory use (Size in MB) -->
+			<ProcVMSizeWarn>1800</ProcVMSizeWarn>
+			<!-- Log notification threshold for reverting to a nominal process     -->
+			<!-- virtual memory use (Size in MB) after ProcVMSizeWarn threshold    -->
+			<!-- has been triggered.                                               -->
+			<ProcVMSizeNominal>1600</ProcVMSizeNominal>
+
+			<!-- Specifies how often (in min.) to gc the SSL session cache for outgoing SSL connections. -->
+			<SSLSessionCacheGC>5</SSLSessionCacheGC>
+			<!-- AMS provides connectors which allow application scripts to connect to other AMS server or. -->
+			<!-- HTTP servers. This section configures the connector subsystem -->
+			<Connector>
+				<!-- HTTP connector : Used for Flash remoting-->
+				<HTTP>
+					<!-- For all thread configuration.                                                 -->
+					<!-- A value of 0 allocates the default number of threads.                         -->
+					<!-- A value greater than 0 allocates the exact number of threads specified.       -->
+					<!-- A value less than 0 ties it to the number (N) of processors,                  -->
+					<!--       -1 means 1xN threads                                                    -->
+					<!--       -2 means 2xN threads etc.                                               -->
+					<!--Minimum number threads used for processing connection requests. 0 = default = 2 -->
+					<MinConnectionThreads>0</MinConnectionThreads>
+					<!-- Maximum number of threads that can be created for connection processing. 0 = use default (10) -->
+					<MaxConnectionThreads>0</MaxConnectionThreads>
+					<!-- Max connections requests that can be pending. Connections will be rejected if queue size limit is reached. -->
+					<!-- -1 = default = 1000. -->
+					<MaxConnectionQueueSize>-1</MaxConnectionQueueSize>
+					<!-- Specifies how long to wait before timing out an outgoing connection in milliseconds	-->
+					<!-- Default is set to -1 to use blocking outgoing connections with OS timeout		-->
+					<ConnectionTimeout>-1</ConnectionTimeout>
+
+					<!-- Configures how to cache handles used for HTTP requests -->
+					<HandleCache>
+						<!-- Max number of handles to cache -->
+						<MaxSize>100</MaxSize>
+						<!-- If no http requests have been made to a host for this long, -->
+						<!-- we will free some of the handles cached for this host. Time -->
+						<!-- is specified in minutes. Default is 10 minutes.             -->
+						<IdleTime>30</IdleTime>
+						<!-- When gc'ing handles, we don't gc all the handles for a host -->
+						<!-- all at once. Instead, we trim a percentage of the cached    -->
+						<!-- handles. Specified as a number between 0 and 1. Default is  -->
+						<!-- 0.2 (20%).                                                  -->
+						<TrimSize>0.2</TrimSize>
+						<!-- How often to gc idle handles. Specified in minutes. Default -->
+						<!-- is 60 min.                                                  -->
+						<GCInterval>60</GCInterval>
+					</HandleCache>
+				</HTTP>
+				<!-- RTMP connector : For server to server connections-->
+				<RTMP>
+					<!-- For all I/O  and connection threads processing. -->
+					<!-- A value of 0 allocates the default number of threads (10).                    -->
+					<!-- A value greater than 0 allocates the exact number of threads specified.       -->
+					<!-- A value less than 0 ties it to the number (N) of processors,                  -->
+					<!--       -1 means 1xN threads                                                    -->
+					<!--       -2 means 2xN threads etc.                                               -->
+					<!--Minimum numnber threads in the pool for I/O operations. 0 = defualt value 2x processor -->
+					<MinIOThreads>0</MinIOThreads>
+					<!-- Maximum number of threads that can be created for I/O processing. -1 = use default (32) -->
+					<MaxIOThreads>32</MaxIOThreads>
+					<!-- Number of completion routine threads that for edge (on win32) I/O processing. -->
+					<NumCRThreads>0</NumCRThreads>
+					<!--Minimum number threads used for processing connection requests. 0 = default = 1 -->
+					<MinConnectionThreads>0</MinConnectionThreads>
+					<!-- Maximum number of threads that can be created for connection processing. 0 = use default (5) -->
+					<MaxConnectionThreads>0</MaxConnectionThreads>
+					<!-- Max connections requests that can be pending. Connections will be rejected if queue size limit is reached. -->
+					<!-- -1 = default = 1000. -->
+					<MaxConnectionQueueSize>-1</MaxConnectionQueueSize>
+					<!-- Specifies how long to wait before timing out an outgoing connection in milliseconds	-->
+					<!-- Default is set to -1 to use blocking outgoing connections with OS timeout		-->
+					<ConnectionTimeout>-1</ConnectionTimeout>
+					<!-- Aggregate messages increase performance by batching messages together	-->
+					<!-- Should be left true to gain benefitted performance				-->
+					<EnableAggMsgs>true</EnableAggMsgs>
+				</RTMP>
+			</Connector>
+			<Protocol>
+				<!-- RTMP protocol configuration -->
+				<!-- For all I/O  and connection threads processing. -->
+				<!-- A value of 0 allocates the default number of threads (10).                    -->
+				<!-- A value greater than 0 allocates the exact number of threads specified.       -->
+				<!-- A value less than 0 ties it to the number (N) of processors,                  -->
+				<!--       -1 means 1xN threads                                                    -->
+				<!--       -2 means 2xN threads etc.                                               -->
+				<RTMP>
+					<Edge>
+						<!--Minimum numnber threads in the pool for I/O operations. 0 = 2 x Number of processors -->
+						<MinIOThreads>0</MinIOThreads>
+						<!-- Maximum number of threads that can be created for I/O processing. 0 = use default ( 10) -->
+						<MaxIOThreads>0</MaxIOThreads>
+						<!--Size of direct access socket table for quick lookup. -1 = default = 200 -->
+						<SocketTableSize>-1</SocketTableSize>
+						<!-- Number of overflow buckets if all slots in socket table are in use. -1 = use default (16) -->
+						<SocketOverflowBuckets>-1</SocketOverflowBuckets>
+						<!-- The maximum number of connections per second the server will -->
+						<!-- accept. NOTE: this is per listener. So if AMS has multiple   -->
+						<!-- listeners configured (i.e. listening on multiple ports), the -->
+						<!-- connection rate configured here will apply to each listener. -->
+						<!-- Default is -1 which means connection throttling is disabled. -->
+						<MaxConnectionRate>-1</MaxConnectionRate>
+					</Edge>
+					<Core>
+						<!--Minimum numnber threads in the pool for I/O operations. 0 = 2 x Number of processors -->
+						<MinIOThreads>0</MinIOThreads>
+						<!-- Maximum number of threads that can be created for I/O processing. 0 = use default ( 10) -->
+						<MaxIOThreads>0</MaxIOThreads>
+						<!--Size of direct access socket table for quick lookup. -1 = default = 200 -->
+						<SocketTableSize>-1</SocketTableSize>
+						<!-- Number of overflow buckets if all slots in socket table are in use. -1 = use default (16) -->
+						<SocketOverflowBuckets>-1</SocketOverflowBuckets>
+					</Core>
+					<Admin>
+						<!--Minimum numnber threads in the pool for I/O operations. 0 = 2 x Number of processors -->
+						<MinIOThreads>0</MinIOThreads>
+						<!-- Maximum number of threads that can be created for I/O processing. 0 = use default ( 10) -->
+						<MaxIOThreads>0</MaxIOThreads>
+						<!--Size of direct access socket table for quick lookup. -1 = default = 200 -->
+						<SocketTableSize>-1</SocketTableSize>
+						<!-- Number of overflow buckets if all slots in socket table are in use. -1 = use default (16) -->
+						<SocketOverflowBuckets>-1</SocketOverflowBuckets>
+					</Admin>
+					<!-- Specifies the size (in bytes) of the socket send buffer. -->
+					<!-- Default is 0 which means to use OS default.              -->
+					<SocketSndBuf>0</SocketSndBuf>
+					<!-- Specifies the size (in bytes) of the socket recv buffer. -->
+					<!-- Default is 0 which means to use OS default.              -->
+					<SocketRcvBuf>0</SocketRcvBuf>
+
+					<!-- Together with DiffServMask, this allows specifying -->
+					<!-- the differential services field for all sockets    -->
+					<!-- that connect to the RTMP listener (which includes  -->
+					<!-- tunneling and HTTP proxy sockets). There is little -->
+					<!-- use for this unless you have set up a DSCP domain, -->
+					<!-- and some values may lead to errors, depending on   -->
+					<!-- your platform and your router configuration. For   -->
+					<!-- example, to set priority class 4, you might set    -->
+					<!-- DiffServ to 128 (top 3 bits set to 4) and set      -->
+					<!-- DiffServMask to 224 (top 3 bits on).               -->
+					<DiffServ>0</DiffServ>
+					<!-- This controls which bits in the diffserv field     -->
+					<!-- will be modified. Typically, it will be 0 (which   -->
+					<!-- disables the feature), 252 (to control all 6 bits  -->
+					<!-- of the field), or 224 (to control only the top 3   -->
+					<!-- bits, which are often used for priority). Other    -->
+					<!-- values are legal, but setting the low two bits may -->
+					<!-- lead to errors, depending on your platform and     -->
+					<!-- your router configuration.                         -->
+					<DiffServMask>0</DiffServMask>
+				</RTMP>
+				<!--Edge core communication protocol -->
+				<ECCP>
+					<!--Minimum numnber threads in the pool for I/O operations. 0 = 2 -->
+					<MinIOThreads>0</MinIOThreads>
+					<!-- Maximum number of threads that can be created for I/O processing. 0 = use default (10) -->
+					<MaxIOThreads>0</MaxIOThreads>
+					<!--Size of direct access socket table for quick lookup. -1 = default = 200 -->
+					<SocketTableSize>-1</SocketTableSize>
+					<!-- Number of overflow buckets if all slots in socket table are in use. -1 = use default (16) -->
+					<SocketOverflowBuckets>-1</SocketOverflowBuckets>
+					<!-- Timeout (seconds) to detect unresponsive cores. 0 will disable timeout check. -->
+					<CoreTimeout>30</CoreTimeout>
+				</ECCP>
+				<!--Admin core communication protocol -->
+				<ACCP>
+					<!--Minimum numnber threads in the pool for I/O operations. 0 = 2 -->
+					<MinIOThreads>0</MinIOThreads>
+					<!-- Maximum number of threads that can be created for I/O processing. 0 = use default (10) -->
+					<MaxIOThreads>0</MaxIOThreads>
+					<!--Size of direct access socket table for quick lookup. -1 = default = 200 -->
+					<SocketTableSize>-1</SocketTableSize>
+					<!-- Number of overflow buckets if all slots in socket table are in use. -1 = use default (16) -->
+					<SocketOverflowBuckets>-1</SocketOverflowBuckets>
+				</ACCP>
+			</Protocol>
+			<IPCQueues>
+				<!-- Controls the IPC msg queue used by all processes to communicate with each other. -->
+				<GlobalQueue>
+					<!-- Max size (in Kb) of the shared memory heap used for this IPC msg queue. -->
+					<HeapSize>2048</HeapSize>
+					<MaxQueueSize>10</MaxQueueSize>
+				</GlobalQueue>
+				<!-- Controls the IPC msg queue used by edge and core processes to communicate with each other. -->
+				<EdgeCore>
+					<!-- Max size (in Kb) of the shared memory heap used for this IPC msg queue. -->
+					<HeapSize>1024</HeapSize>
+					<MaxQueueSize>10</MaxQueueSize>
+				</EdgeCore>
+				<Services>
+					<!-- Max size (in Kb) of the shared memory heap used for this IPC msg queue. -->
+					<HeapSize>2048</HeapSize>
+					<MaxQueueSize>10</MaxQueueSize>
+				</Services>
+			</IPCQueues>
+			<MessageCache enable="false">
+				<!-- Max free units in the cache. Note this may be less if "MaxSize" limit is reached -->
+				<MaxCacheUnits>4096</MaxCacheUnits>
+				<!-- Max size of the cache in mega bytes. -->
+				<MaxCacheSize>100</MaxCacheSize>
+				<!-- Max message size thresold to get back into the cache. Specified in kilo bytes. -->
+				<MaxUnitSize>16</MaxUnitSize>
+				<!-- Value between 0 and 1 -->
+				<FreeRatio>0.125</FreeRatio>
+				<!-- Value between 0 and 1 -->
+				<GlobalRatio>0.4</GlobalRatio>
+				<!-- Max reuse count before freeing cache unit -->
+				<MaxAge>1000000</MaxAge>
+				<!-- Max reuse count before freeing cache unit -->
+				<UpdateInterval>1024</UpdateInterval>
+				<!-- Value between 0 and 1 -->
+				<FreeMemRatio>0.5</FreeMemRatio>
+			</MessageCache>
+			<SmallMemPool enable="false">
+				<!-- Max free units in the cache. Note this may be less if "MaxSize" limit is reached -->
+				<MaxCacheUnits>4096</MaxCacheUnits>
+				<!-- Max size of the cache in mega bytes. -->
+				<MaxCacheSize>100</MaxCacheSize>
+				<!-- Max message size thresold to get back into the cache. Specified in kilo bytes. -->
+				<MaxUnitSize>16</MaxUnitSize>
+				<!-- Value between 0 and 1 -->
+				<FreeRatio>0.125</FreeRatio>
+				<!-- Value between 0 and 1 -->
+				<GlobalRatio>0.4</GlobalRatio>
+				<!-- Max reuse count before freeing cache unit -->
+				<MaxAge>1000000</MaxAge>
+				<!-- Max reuse count before freeing cache unit -->
+				<UpdateInterval>1024</UpdateInterval>
+				<!-- Value between 0 and 1 -->
+				<FreeMemRatio>0.5</FreeMemRatio>
+			</SmallMemPool>
+			<LargeMemPool enable="false">
+				<!-- Max free units in the cache. Note this may be less if "MaxSize" limit is reached -->
+				<MaxCacheUnits>4096</MaxCacheUnits>
+				<!-- Max size of the cache in mega bytes. -->
+				<MaxCacheSize>100</MaxCacheSize>
+				<!-- Max message size thresold to get back into the cache. Specified in kilo bytes. -->
+				<MaxUnitSize>16</MaxUnitSize>
+				<!-- Value between 0 and 1 -->
+				<FreeRatio>0.125</FreeRatio>
+				<!-- Value between 0 and 1 -->
+				<GlobalRatio>0.4</GlobalRatio>
+				<!-- Max reuse count before freeing cache unit -->
+				<MaxAge>1000000</MaxAge>
+				<!-- Max reuse count before freeing cache unit -->
+				<UpdateInterval>1024</UpdateInterval>
+				<!-- Value between 0 and 1 -->
+				<FreeMemRatio>0.5</FreeMemRatio>
+			</LargeMemPool>
+			<SegmentsPool enable="false">
+				<!-- Max free units in the cache. Note this may be less if "MaxSize" limit is reached -->
+				<MaxCacheUnits>4096</MaxCacheUnits>
+				<!-- Max size of the cache in mega bytes. -->
+				<MaxCacheSize>100</MaxCacheSize>
+				<!-- Max message size thresold to get back into the cache. Specified in kilo bytes. -->
+				<MaxUnitSize>16</MaxUnitSize>
+				<!-- Value between 0 and 1 -->
+				<FreeRatio>0.125</FreeRatio>
+				<!-- Value between 0 and 1 -->
+				<GlobalRatio>0.4</GlobalRatio>
+				<!-- Max reuse count before freeing cache unit -->
+				<MaxAge>1000000</MaxAge>
+				<!-- Max reuse count before freeing cache unit -->
+				<UpdateInterval>1024</UpdateInterval>
+				<!-- Value between 0 and 1 -->
+				<FreeMemRatio>0.5</FreeMemRatio>
+			</SegmentsPool>
+			<Master>
+				<!-- How often to gc idle cores.                                             -->
+				<CoreGC>300</CoreGC>
+
+				<!-- An idle core being gc'd is given at least this much to exit on its own. -->
+				<CoreExitDelay>20</CoreExitDelay>
+			</Master>
+			<Edge>
+				<!-- Minimum number of threads per scheduler queue                  -->
+				<MinEventQueueThreads>2</MinEventQueueThreads>
+
+				<!-- Maximum number of threads per scheduler queue                  -->
+				<MaxEventQueueThreads>-2</MaxEventQueueThreads>
+
+				<!-- Number of scheduler queues         			    -->
+				<NumSchedQueues>1</NumSchedQueues>
+			</Edge>
+		</ResourceLimits>
+
+		<!-- Overall logging configuration. This section contains only information that is  -->
+		<!-- that controls the overall logging behaviour. Specific logging configuration is -->
+		<!-- located in Logger.xml.                                                         -->
+		<Logging>
+			<!-- The time field in a log file can be either in utc (gmt) or local (default).-->
+			<Time>local</Time>
+
+			<!-- Logs recovery properies -->
+
+			<!-- Number of times to retry opening a log file.  -->
+			<RetryNumber>0</RetryNumber>
+
+			<!-- Number of milliseconds the server waits before re-trying to open a log file.-->
+			<RetrySleep>100</RetrySleep>
+
+			<!-- The number of records in the log queue.                                     -->
+ 			<!-- If an attempt to open the log has failed and the queue has a number of      -->
+			<!-- records greater than or equal to this number, the core process is shut down.-->
+			<!-- -1 unlimited  -->
+			<RecordsNumber>-1</RecordsNumber>
+
+			<!-- This controls the terminating characters of each log entry -->
+			<!-- CR = carriage return and LF = line feed.  Default is CRLF  -->
+			<TerminatingCharacters>CRLF</TerminatingCharacters>
+
+			<!-- Enables/Disables logging of high severity entries to the system log -->
+			<!-- Set to false to disable - default is enabled			 -->
+			<EnableSystemLogging>true</EnableSystemLogging>
+
+      			<Access>
+				<!-- Whether access logging is enabled.                                     -->
+				<Enable>true</Enable>
+
+				<!-- The logging scope determines whether a log file is written out for     -->
+				<!-- each vhost or just one for the entire server. It may be either server  -->
+				<!-- or vhost.                                                              -->
+				<Scope>server</Scope>
+				<!-- Checkpoints are snapshots of activities that occurs in the server such -->
+				<!-- as connect and stream events.  If it is enabled, server logs extra     -->
+				<!-- checkpoints for these events (connect, play, publish) not only at the  -->
+				<!-- beginning and the end, but also at a regular interval based on the     -->
+				<!-- configuration.  The checkpoints will be showing as connect-continue,   -->
+				<!-- play-continue, and publish-continue.  These checkpoints events can be  -->
+				<!-- found in Logger.xml and can be turned on/off individually.             -->
+				<!-- This can be overridden on a per-vhost basis. However, if disabled      -->
+				<!-- here, it is disabled for all vhosts. But if enabled here, vhosts can   -->
+				<!-- override it and disable it for that vhost. Vhosts can also override    -->
+				<!-- the max idle time (for that vhost only).  <CheckInterval> is not       -->
+				<!-- overridable and applies to all vhosts.                                 -->
+				<Checkpoints enable="false">
+					<!-- How often to check if it is necessary to log a checkpoint into -->
+					<!-- access log.  Specified in seconds.                             -->
+					<!-- Default is to check every 60 sec. (1 min)                      -->
+					<CheckInterval>60</CheckInterval>
+					<!-- How often to log a checkpoint. Specified in seconds.  This     -->
+					<!-- should be bigger than CheckInterval, otherwise server still    -->
+					<!-- logs checkpoint every check interval.                          -->
+					<!-- Default is to check every 3600 sec. (60 min)                   -->
+					<LogInterval>3600</LogInterval>
+				</Checkpoints>
+			</Access>
+			<Diagnostic>
+				<!-- Whether diagnostic logging is enabled.                                 -->
+				<Enable>true</Enable>
+			</Diagnostic>
+			<Application>
+				<!-- Whether application logging is enabled.                                -->
+				<Enable>true</Enable>
+			</Application>
+			<AuthEvent>
+				<!-- Whether logging is enabled.                                -->
+				<Enable>true</Enable>
+			</AuthEvent>
+ 			<AuthMessage>
+				<!-- Whether logging is enabled.                                -->
+				<Enable>true</Enable>
+			</AuthMessage>
+			<FileIO>
+				<!-- Whether logging is enabled.                                -->
+				<Enable>true</Enable>
+			</FileIO>
+		</Logging>
+
+		<!-- Server must reference itself locally, typically this is "localhost", but with more than one -->
+		<!-- Network Interface, "localhost" can map to an erroneous interface, thus the server will use	 -->
+		<!-- the address listed here as the local loopback, default is "localhost"     			 -->
+		<Localhost>localhost</Localhost>
+
+		<!-- If system has more than 2 network ports, setup the public ip for the system  -->
+                <PublicIP></PublicIP>
+
+		<!-- SWFVerification configures how a SWF connecting to an app is verified.	-->
+    <!-- This is for the Administrator level SWF Verification and is secondary  -->
+    <!-- and independent of the Application level SWF Verification setups.  The -->
+    <!-- intended use is to put Administrator SWFs here that need to act as a   -->
+    <!-- skeleton key (universal access) for apps needing SWF Verification      -->
+    <!-- There is no override here of the Application level SWF Verification    -->
+		<SWFVerification>
+
+			<!-- Any SWFs found in this folder will be authenticated for connecting to any application	-->
+			<!-- on this server.  You can use a semicolon to seperate multiple directories here as well	-->
+			<!-- For example C:\SWFs;D:\SWFs will allow swfs from either of these two directories to    -->
+			<!-- be authenticated.                                                                      -->
+			<SWFFolder></SWFFolder>
+
+			<!-- This specifies the number of levels for subfolders in SWFFolder to scan  		-->
+			<!-- for SWFs files. Negative value means all existing subfolders level are scanned.   	-->
+			<!-- Default is 1 which means the only one subfolder level is scanned. 	                -->
+			<DirLevelSWFScan>1</DirLevelSWFScan>
+
+			<!-- The maximum time (sec) for processing swf files. Default value is 5 sec -->
+			<MaxInitDelay>5</MaxInitDelay>
+
+			<!-- This specifies the minimum accepted version of SWFVerification allowed by the server.	-->
+			<!-- Initial version is 1; default is 0 which means to accept all forward versions.         -->
+			<MinGoodVersion></MinGoodVersion>
+			<!-- SWFVerification data are cache in the server.  This configures how the cache behaves.  -->
+			<Cache>
+				<!-- TTL is the time to live of each SWF in the cache.  Specified in minutes.       -->
+				<!-- Default value is 1440 minutes (24 hours)                                       -->
+				<TTL>1440</TTL>
+				<!-- The maximum time to wait for the server to scan the SWF folders for updates    -->
+				<!-- when there is a miss in the cache.  Specified in minutes.  Default value is    -->
+				<!-- 5 minutes.                                                                     -->
+				<UpdateInterval>5</UpdateInterval>
+			</Cache>
+		</SWFVerification>
+
+		<!-- Specific configurations for playing back recorded streams	-->
+		<!-- Example: Settings for MP4, FLV, RAW, or MP3 reading		-->
+		<Streams>
+
+			<!-- Controls the log level for all stream adaptors.  Supported levels (from high to low) -->
+			<!-- are "verbose", "warning", and "error".                                               -->
+			<StreamLogLevel>warning</StreamLogLevel>
+			<!-- Maximum Duration in Millisconds of an aggregate message while -->
+			<!-- reading from flv. Default is 10000 Millisconds. -->
+			<!-- <MaxAggMsgDuration>10000</MaxAggMsgDuration >		-->
+
+			<!-- mp4: specific configurations.  Usually used for controlling play and record of	-->
+			<!-- mp4, f4v, mov, and other mp4: type files.						-->
+			<Mp4>
+				<!-- mp4: Playback specific configurations -->
+				<Playback>
+					<!-- In each mp4: file video, audio, and other data read from disk are cached 	-->
+					<!-- within the module memory.  This caching allows fewer disk reads and	-->
+					<!-- generally better performance.  Each type has its own cache because a single-->
+					<!-- type tends to be located in the same disk area - thus increasing the 	-->
+					<!-- efficiency of separate caches.  These values may be tuned, depending on	-->
+					<!-- content makeup, to achieve better disk performance.  For example: audio	-->
+					<!-- only content would benefit from a larger audio buffer, and minimal video	-->
+					<!-- Note: Minimum size is 1024 bytes for any buffer.				-->
+					<!-- Defaults are 153600 bytes video, 51200 bytes audio, and 10240 other 	-->
+					<VideoAutoBufferReadSize>153600</VideoAutoBufferReadSize>
+					<AudioAutoBufferReadSize>51200</AudioAutoBufferReadSize>
+					<OtherAutoBufferReadSize>10240</OtherAutoBufferReadSize>
+					<!-- Aggregate messages increase performance by batching messages together	-->
+					<!-- Should be left true to gain benefitted performance				-->
+					<EnableAggMsgs>true</EnableAggMsgs>
+					<!-- Maximum size of an aggregate message.  Default is 64 kBytes		-->
+					<MaxAggMsgSize>65536</MaxAggMsgSize>
+					<!-- Maximum Duration in Millisconds of an aggregate message while -->
+					<!-- reading from mp4. Default is 10000 Millisconds. -->
+					<!-- <MaxAggMsgDuration>10000</MaxAggMsgDuration >		-->
+
+					<!-- Maximum number of tracks allowed in a file.  While only one video, audio,	-->
+					<!-- and data track may be played, files with up to this many tracks can be	-->
+					<!-- parsed.  More than this amount is a file error. Default is 64 .		-->
+					<MaxTracks>64</MaxTracks>
+					<!-- The maximum allowable size of a sample in an mp4: file.  For safety from	-->
+					<!-- erroneous files, sample sizes are limited to 16 MB.  This value may be 	-->
+					<!-- increased in case of a file with larger samples up to 4GB. Default 16MB.	-->
+					<MaxSampleSize>16777216</MaxSampleSize>
+					<!-- By default AMS will reject streaming any H264 video profiles that do not	-->
+					<!-- match those supported by Flash Player 10.0 .  This overrides this setting	-->
+					<AllowAnyAVCProfile>false</AllowAnyAVCProfile>
+					<!-- By default AMS will reject streaming any AAC audio profiles that do not	-->
+					<!-- match those supported by Flash Player 10.0 .  This overrides this setting	-->
+					<AllowAnyAACProfile>false</AllowAnyAACProfile>
+					<!-- When enabled, AMS will process the video packets for closed caption and   -->
+					<!-- generate onCaptionInfo message to be sent to the client. 					       -->
+					<!-- This overrides this setting.												                       -->
+					<GenerateCCInfo>false</GenerateCCInfo>
+				</Playback>
+				<!-- mp4: Recording specific configurations -->
+				<Recording>
+					<!-- Maximum ELST entries in a recording.  ELST entries are used when there 	-->
+					<!-- are gaps in a kind of content.  Gaps occur during an append to the file	-->
+					<!-- or when content like video ends while other content proceeds.  If more	-->
+					<!-- gaps or appends occur than configured here, recording would terminate	-->
+					<!-- Making this value too high takes up unnecessary space in each recorded file-->
+					<!-- Default value is 100							-->
+					<MaxELSTEntries>100</MaxELSTEntries>
+					<!-- Each change in codec for a content type, like two different video codecs	-->
+					<!-- takes a sample description.  All space for sample descriptions is made on	-->
+					<!-- file creation.  If codec type changes more than descriptions available	-->
+					<!-- recording will terminate.  Adding too many descriptions takes unnecessary	-->
+					<!-- space for every file record. -->
+					<MaxDataSampleDescriptions>10</MaxDataSampleDescriptions>
+					<MaxAudioSampleDescriptions>20</MaxAudioSampleDescriptions>
+					<MaxVideoSampleDescriptions>10</MaxVideoSampleDescriptions>
+				</Recording>
+			</Mp4>
+
+			<!-- raw: specific configurations.  Used for controlling play and record of "raw" files	-->
+			<Raw>
+				<!-- Aggregate messages increase performance by batching messages together	-->
+				<!-- Should be left true to gain benefitted performance				-->
+				<EnableAggMsgs>true</EnableAggMsgs>
+				<!-- Maximum size of an aggregate message.  Default is 64 kBytes		-->
+				<MaxAggMsgSize>65536</MaxAggMsgSize>
+				<!-- Maximum Duration in Millisconds of an aggregate message while -->
+				<!-- reading from raw. Default is 10000 Millisconds. -->
+				<!-- <MaxAggMsgDuration>10000</MaxAggMsgDuration >		-->
+			</Raw>
+
+			<!-- This section is specific to stream adaptors. By using this,	                -->
+			<!-- one can specify which lib to load for a particular stream                          -->
+			<!-- prefix. The filename of the library  needs to be mentioned without the             -->
+			<!-- extension. For example, specify 'flvlib' rather than 'flvlib.dll'.	                -->
+			<StreamAdaptors>
+				<f4f lib="libf4f"/>
+				<flv lib="libflv"/>
+				<mp3 lib="libmp3"/>
+				<mp4 lib="libmp4"/>
+				<raw lib="libraw"/>
+				<id3 lib="libid3"/>
+			</StreamAdaptors>
+		</Streams>
+
+		<!-- Specifies how the built-in webserver should be stopped and  -->
+		<!-- started. The command line will be                           -->
+		<!--     $Directory/$Program -d $Directory $Options -k start     -->
+		<!--     $Directory/$Program -d $Directory $Options -k stop      -->
+		<!-- (where $Directory can be either relative to $AMSROOT or     -->
+		<!-- absolute). On Windows only, Service specifies the name used -->
+		<!-- to install the webserver as an NT service; if present,      -->
+		<!-- service; if present                                         -->
+		<!--     -n $Service                                             -->
+		<!-- will be appended to both commands. Linux will ignore this.  -->
+		<Httpd enabled="${SERVER.HTTPD_ENABLED}">
+			<Directory>Apache2.4</Directory>
+			<Program>bin/httpd</Program>
+			<Options>-f ./conf/httpd.conf</Options>
+			<Service>AMSHttpd</Service>
+		</Httpd>
+
+		<!-- Specifies how the cacheclean tool for webserver should be   -->
+		<!-- started. The command line will be                           -->
+		<!-- $Directory/$Program $RequiredOptions $AdditionalOptions     -->
+		<!-- (where $Directory can be either relative to $AMSROOT or     -->
+		<!-- absolute; All mandatory options for the Program need to be  -->
+    <!-- taken care inside RequiredOptions tag, and any additonal    -->
+    <!-- options need to be included in AdditionalOptions tag.)      -->
+		<!-- The cache is enabled/cleaned by default on Linux only.      -->
+		<HtCacheClean enabled="${SERVER.HTCACHECLEAN_ENABLED}">
+			<Directory>Apache2.4/bin</Directory>
+			<Program>htcacheclean</Program>
+      <RequiredOptions>-p "${SERVER.HTCACHEROOT}" -d5 -l1024K</RequiredOptions>
+      <AdditionalOptions>-n -t -i</AdditionalOptions>
+		</HtCacheClean>
+
+		<!-- This section is specific to scriptengine adaptors. By using    -->
+		<!-- this, one can specify which lib to load for an adaptor id      -->
+		<!-- specified in application.xml. The filename needs to be         -->
+		<!-- mentioned without the extension.                               -->
+		<ScriptAdaptors>
+			<as1 lib="libasc"/>
+		</ScriptAdaptors>
+
+
+		<!-- Enable registry core. Enablig registry core activates a single -->
+		<!-- extra AMSCore instance dedicated to handling services for      -->
+		<!-- Adobe Connect and AMG. This AMSCore will be brought to life on -->
+		<!-- startup and allows Connect and AMG to register their services  -->
+		<!-- to AMS. Default is disabled and should only be activated when  -->
+		<!-- used in conjunction with these secondary Adobe products.       -->
+		<Registry enabled="false">
+			<!-- Adaptor to run registry core on -->
+			<AdaptorName>_defaultRoot_</AdaptorName>
+		</Registry>
+
+	</Server>
+
+	<!-- Set this to the domain name of the server. It is used to set the hostname in -->
+	<!-- the referrer header tag when making a connection with a remote server using  -->
+	<!-- NetConnection. If empty the hostname field is empty in referrer header.      -->
+	<ServerDomain></ServerDomain>
+</Root>

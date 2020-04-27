@@ -1,0 +1,1038 @@
+<Application>
+	<Process>
+    <!-- The process scope in which instances of this application will  -->
+    <!-- run. An application instance may run by itself in a process,   -->
+    <!-- along with other instances or even be distributed among        -->
+    <!-- multiple processes. The process scope may be one of adaptor,   -->
+    <!-- vhost, app or inst, with the default being vhost. These values -->
+    <!-- determine how various application instances are grouped into   -->
+    <!-- processes, in the following manner,                            -->
+    <!--                                                                -->
+    <!--    adaptor       all instances in an adaptor run in a process  -->
+    <!--    vhost         all instances in a vhost run in a process     -->
+    <!--    app	          all instances in an app run in a process      -->
+    <!--    inst          each instance runs in a process               -->
+    <Scope></Scope>
+
+    <!-- Whether to distribute the above process scope into multiple    -->
+    <!-- processes. One can distribute vhosts, applications, instances  -->
+    <!-- or even clients across the process group. These entities have  -->
+    <!-- a complete enclosing relationship or a strict ordering among   -->
+    <!-- them, for e.g. adaptors contain vhosts, which contain apps     -->
+    <!-- etc. The complete ordering is,                                 -->
+    <!--                                                                -->
+    <!--   . Adaptors                                                   -->
+    <!--   . VHosts                                                     -->
+    <!--   . Applications                                               -->
+    <!--   . Instances                                                  -->
+    <!--   . Clients                                                    -->
+    <!--                                                                -->
+    <!-- The entity chosen for <Distribute> tag must be lower or        -->
+    <!-- contained in the process scope specified in the <Scope> tag.   -->
+    <!-- Possible values are: vhost, app, inst, client                  -->
+    <!-- As a convenience, we also allow the following variations to be -->
+    <!-- specified: vhosts, apps, application, applications, insts,     -->
+    <!-- instance, instances, and clients.                              -->
+    <!--                                                                -->
+    <!-- If process scope is set to adaptor, you can choose to          -->
+    <!-- distribute by vhost, app, inst, or client.                     -->
+    <!-- If process scope is set to vhost, you can choose to distribute -->
+    <!-- by app, inst, or client.                                       -->
+    <!-- If process scope is set to app, you can choose to distribute   -->
+    <!-- by inst, or client.                                            -->
+    <!-- If process scope is set to inst, you can choose to distribute  -->
+    <!-- only by client.                                                -->
+    <!--                                                                -->
+    <!-- Choosing to distribute by client indicates a stateless         -->
+    <!-- application, wherein all clients need not rendezvous on a      -->
+    <!-- single instance. Typical VOD (Video on Demand) applications    -->
+    <!-- are stateless, as each user plays some content independent of  -->
+    <!-- all other instances. On the other hand a chat or gaming        -->
+    <!-- application is not stateless as all participants need to       -->
+    <!-- rendezvous on a single instance wherein they share the         -->
+    <!-- application state. By default, entities are distributed over   -->
+    <!-- 3 cores, which maximizes the server's ability to utilize       -->
+    <!-- system resources.  Distribution may be turned off by setting   -->
+    <!-- numprocs to 0 or 1. Also by default the server chooses to      -->
+    <!-- distribute the immediately lower entity to the one specified   -->
+    <!-- in <Scope> tag.                                                -->
+    <Distribute numprocs="3">inst</Distribute>
+
+    <!-- The lifetime of a core process can be specified to not exceed  -->
+    <!-- a certain period, wherein any connections after this will      -->
+    <!-- result in rolling over to a new core process. The <RollOver>   -->
+    <!-- tag determines this time period which is specified in seconds. -->
+    <!-- For stateless applications, the older core process continues   -->
+    <!-- to serve the earlier connections. In this case one can limit   -->
+    <!-- the maximum number of core processes that may be running       -->
+    <!-- simultaneously by specifying an appropriate value in the       -->
+    <!-- <MaxCores> tag.                                                -->
+    <!--                                                                -->
+    <!-- An application is considered to be stateless if it is          -->
+    <!-- configured to distribute clients over multiple processes. This -->
+    <!-- may be done explicitly specifying "clients" for distribution,  -->
+    <!-- or implicitly by choosing "inst" process scope, of course      -->
+    <!-- distribution must be enabled in the first place by setting     -->
+    <!-- numprocs to a value greater than 1. If the application is not  -->
+    <!-- stateless, the server ignores the <MaxCores> value and forces  -->
+    <!-- it to 1. This ensures that such an application instance is not -->
+    <!-- split across multiple processes, but results in clients        -->
+    <!-- getting disconnected on a periodic basis. As such this is      -->
+    <!-- mostly useful for stateless applications, and may have limited -->
+    <!-- applicability otherwise.                                       -->
+    <!--                                                                -->
+    <!-- Process rollover may be disabled by setting the rollover time  -->
+    <!-- to 0 and is the default. Limiting the number of core processes -->
+    <!-- may be disabled by setting it to 0 and is the default too.     -->
+    <LifeTime>
+      <RollOver></RollOver>
+      <MaxCores></MaxCores>
+    </LifeTime>
+
+    <!-- Determines the maximum number of process failures that will be -->
+		<!-- tolerated before a core process is disabled. Once disabled the -->
+		<!-- the master will not launch a core process till some minimum    -->
+		<!-- recovery time elapses. This may be used to guard against a DOS -->
+		<!-- behaviour where a faulty core consumes all cpu time by being   -->
+		<!-- repeatedly launched very quickly. The recovery time is         -->
+		<!-- specified in seconds, and setting it to 0 disables checking    -->
+		<!-- for process failures. Note loading an application via admin    -->
+		<!-- tools or APIs bypasses this check.                             -->
+		<MaxFailures>2</MaxFailures>
+		<RecoveryTime>0</RecoveryTime>
+	</Process>
+
+	<!-- Specifies whether or not to load this app when the server starts. -->
+	<LoadOnStartup>false</LoadOnStartup>
+
+	<!-- Max time an app instance can be idle (no clients connected)  -->
+	<!-- before being unloaded. Note: an app instance only goes idle  -->
+	<!-- after the last client disconnects. If the instance is loaded -->
+	<!-- with no clients connected, it is not considered to be idle.  -->
+	<!-- The max idle time is specified in seconds. (20 minutes)      -->
+	<MaxAppIdleTime>1200</MaxAppIdleTime>
+
+  <!-- You can override the settings specified in Vhost.xml for  -->
+  <!-- this vhost by uncommenting the tag below. You can disable -->
+  <!-- auto-close idle clients for this app, or change the max   -->
+  <!-- idle time for clients connected to this vhost. If the max -->
+  <!-- idle time is not specified here, or invalid (i.e. <= 0),  -->
+  <!-- then we use whatever was set at the vhost level.          -->
+  <!--
+  <AutoCloseIdleClients enable="false">
+    <MaxIdleTime>3600</MaxIdleTime>
+  </AutoCloseIdleClients>
+  -->
+
+  <!-- This section contains information about configuring the script engine. -->
+	<ScriptEngine>
+
+		<!-- This specifies the id of the script engine adaptor to use for	  -->
+		<!-- compling and executing the script.								  -->
+		<AdaptorId>as1</AdaptorId>
+
+		<!-- This specifies the max size (Kb.) the runtime can grow to before -->
+		<!-- garbage collection is performed.                                 -->
+		<RuntimeSize>1024</RuntimeSize>
+
+		<!-- This specifies the max number that the server will skip the GC   -->
+		<!-- when the JS engine is busy.  By default, the server will only    -->
+		<!-- do the GC when the JS engine is not busy.  If MaxGCSkipCount is  -->
+		<!-- set to 0, the server will force a GC regardless of the state of  -->
+		<!-- the JS engine.  And if MaxGCSkipCount is positive, the server    -->
+		<!-- will force a GC when the number of skip count exceeds the value  -->
+		<!-- in MaxGCSkipCount.                                               -->
+		<MaxGCSkipCount>-1</MaxGCSkipCount>
+
+		<!-- This specifies the max amount of time (in seconds) that a script -->
+		<!-- function can take to execute. If it takes longer than this max   -->
+		<!-- timeout period, then the script is considered "runaway", and     -->
+		<!-- script execution will be terminated. By default, this value is 0 -->
+		<!-- which means there is no timeout and we do not check for runaway  -->
+		<!-- scripts. Normally you would only want to check for this in a     -->
+		<!-- development environment while debugging and testing apps. In a   -->
+		<!-- production environment, presumably, your apps have been tested   -->
+		<!-- and should not go into any infinite loops (or become "runaway"). -->
+		<MaxTimeOut>0</MaxTimeOut>
+
+		<!-- AMS provides the load API which allows loading other script        -->
+		<!-- files within main.asc. File specified is first resolved using the  -->
+		<!-- main.asc, if the load file is not found in that location, path     -->
+		<!-- specified in this tag is used to resolve the file. This tag can    -->
+		<!-- contain multiple and they must be separated by a ';' Resolution is -->
+		<!-- is done left to right                                              -->
+		<ScriptLibPath>${APP.JS_SCRIPTLIBPATH}</ScriptLibPath>
+
+		<!-- This section specifies virtual directory mappings for file      -->
+		<!-- objects in the script. By using virtual directories, you can    -->
+		<!-- specify file directories for different applications. If the     -->
+		<!-- beginning portion of a file path matches the virtual directory  -->
+		<!-- that is specified, then the storage location of the file maps   -->
+		<!-- to the location specified by the virtual directory mapping. To  -->
+		<!-- specify a virtual directory mapping, you first specify the      -->
+		<!-- virtual directory, followed by a semi-colon, followed by the    -->
+		<!-- actual file location. <virtual dir>;<actual dir>                -->
+    <!-- For example,                                                    -->
+    <!--                                                                 -->
+    <!--     <VirtualDirectory>/foo;c:\somedir</VirtualDirectory>        -->
+    <!--                                                                 -->
+    <!-- This specifies that all logical files beginning with "/foo" are -->
+    <!-- mapped to some directory under C:\somedir. For example, /foo/x  -->
+    <!-- would map to c:\somedir\x. And /foo/x/y would map to            -->
+    <!-- c:\somedir\x\y.                                                 -->
+		<FileObject override="no">
+			<!--
+			<VirtualDirectory></VirtualDirectory>
+			-->
+		</FileObject>
+
+		<XMLSocket>
+			<!-- XMLSocket will close the connection if it receives this much -->
+			<!-- data from XML server without receiving an end tag. This can  -->
+			<!-- be overridden by each XMLSocket by specifying the proeprty,  -->
+			<!-- XMLSocket.maxUnprocessedChars. However, this cannot exceed   -->
+			<!-- what is specified here.                                      -->
+			<MaxUnprocessedChars>4096</MaxUnprocessedChars>
+		</XMLSocket>
+
+		<NetConnection>
+			<!-- Default object encoding to use for SSAS NetConnection. This  -->
+			<!-- can be AMF0 or AMF3.  The default is AMF3.  It can be        -->
+			<!-- overridden for each individual NetConnection by setting the  -->
+			<!-- NetConnection.objectEncoding property to either 0 for AMF0,  -->
+			<!-- or 3 for AMF3.                                               -->
+			<ObjectEncoding>AMF3</ObjectEncoding>
+		</NetConnection>
+
+    <!-- This section configures security for the script engine.        -->
+    <Security>
+		  <!-- Defines the maximum allowed length (in bytes) of the rtmp url-->
+		  <!-- specified for netConnection initiated from server side       -->
+		  <!-- action script. Default value is 32 KB.                       -->
+		  <MaxUrlLength></MaxUrlLength>
+
+      <!-- Configures remote procedure calls(RPC) for each class. This  -->
+      <!-- enables one to specify allowed methods which prevents any    -->
+      <!-- exploit arising from RPC. Set enable equal to true to        -->
+      <!-- activate it otherwise it would be off.                       -->
+      <RPC enable="false">
+        <Client>
+          <Method>
+            <!-- List of methods allowed for remote calls. Names are          -->
+            <!-- case-sensitive and should be in format "[objectPath.]method" -->
+            <!-- or "[objectPath.]object". All the calls with names whose     -->
+            <!-- beginning matches with anyone in the list would be allowed.  -->
+            <!-- For example, <Allow>a.b,X.Y</Allow> would allow these        -->
+            <!-- methods a.b.c, a.b.d, X.Y etc.                               -->
+            <Allow></Allow>
+          </Method>
+        </Client>
+
+        <NetConnection>
+          <!-- Configures the methods on the NetConnection class for RPC. -->
+          <Method>
+            <!-- List of methods allowed for remote calls. Names are          -->
+            <!-- case-sensitive and should be in format "[objectPath.]method" -->
+            <!-- or "[objectPath.]object". All the calls with names whose     -->
+            <!-- beginning matches with anyone in the list would be allowed.  -->
+            <!-- For example, <Allow>a.b,X.Y</Allow> would allow these        -->
+            <!-- methods a.b.c, a.b.d, X.Y etc.                               -->
+            <!-- 'onStatus' is needed here as it is used by AMS internally to -->
+            <!-- provide status information to objects.                       -->
+            <Allow>onStatus</Allow>
+          </Method>
+        </NetConnection>
+
+        <SharedObject>
+          <Method>
+            <!-- List of methods allowed for remote calls. Names are          -->
+            <!-- case-sensitive and should be in format "[objectPath.]method" -->
+            <!-- or "[objectPath.]object". All the calls with names whose     -->
+            <!-- beginning matches with anyone in the list would be allowed.  -->
+            <!-- For example, <Allow>a.b,X.Y</Allow> would allow these        -->
+            <!-- methods a.b.c, a.b.d, X.Y etc.                               -->
+            <Allow></Allow>
+          </Method>
+        </SharedObject>
+
+        <Stream>
+          <Method>
+            <!-- List of methods allowed for remote calls. Names are          -->
+            <!-- case-sensitive and should be in format "[objectPath.]method" -->
+            <!-- or "[objectPath.]object". All the calls with names whose     -->
+            <!-- beginning matches with anyone in the list would be allowed.  -->
+            <!-- For example, <Allow>a.b,X.Y</Allow> would allow these        -->
+            <!-- methods a.b.c, a.b.d, X.Y etc.                               -->
+            <!-- 'onStatus' is needed here as it is used by AMS internally to -->
+            <!-- provide status information to objects.                       -->
+            <Allow>onStatus</Allow>
+          </Method>
+        </Stream>
+      </RPC>
+    </Security>
+	</ScriptEngine>
+
+	<StreamManager>
+		<!-- Specifies the physical location where recorded streams are stored. -->
+		<!-- For example, <StorageDir>c:\myapp\streams\</StorageDir>            -->
+		<StorageDir></StorageDir>
+
+		<!-- Specifies the physical location where Event information for live   -->
+		<!-- streaming are stored. 												-->
+		<!-- For example, <EventsDir>c:\myapp\events\</EventsDir>            -->
+		<EventsDir></EventsDir>
+
+		<!-- Enables mapping of virtual stream paths to different physical locations. -->
+		<!-- This tag is applicable when using the Authorization plug-in.  -->
+		<QualifiedStreamsMapping enable="false" />
+
+		<!-- Specifies the physical location where streams are duplicated   		-->
+		<!-- This location serves as a backup for Stream files           		-->
+		<!-- This location must already exist, and when a stream			-->
+		<!-- is copied here, it will be categorized by instance name by default		-->
+		<!-- To include application name in the file path created the tag		-->
+		<!-- change the appName attribute to "true", if not "false"			-->
+		<!-- Example<DuplicateDir appName="true">c:\backupStreams</DuplicateDir>	-->
+		<DuplicateDir appName="true"></DuplicateDir>
+
+		<!-- Specifies the cache prefix that is passed from the origin server to the 	 -->
+		<!-- proxy server.  This is used by the proxy server as a relative path to       -->
+		<!-- locate the cache file in the CacheDir                                       -->
+		<!-- The type can be set to "path" or "sname".  If type="path", the physical     -->
+		<!-- path of the recorded stream will be appended to the prefix.                 -->
+		<!-- If type = "sname", the stream name will be appended to the prefix           -->
+		<!-- The prefix can be any text with/without preset paramaters, all parameters   -->
+		<!-- are sourrounded by ?.  Everything within the ? will be substituted by the   -->
+		<!-- server.                                                                     -->
+		<!--                                                                             -->
+		<!-- ?IP?      represents the IP address of the server.                           -->
+		<!-- ?APP?     represents the application name.                                   -->
+		<!-- ?APPINST? represents the application instance.                               -->
+		<!-- ?VHOST?   represents the vhost name.                                         -->
+		<!--                                                                             -->
+		<!-- Since the prefix is used as a relative path in the proxy CacheDir, all      -->
+		<!-- parameters should be separate by '/'.  For example, if type = "path" and    -->
+		<!-- the recorded stream is located in c:/ams/flvs/foo.flv.                      -->
+		<!-- data/?IP? will be resolved into data/xxx.xxx.xxx.xxx/c/ams/flvs/foo.flv     -->
+		<!-- ?APPINST?/data will be resolved into app1/inst1/data/c/ams/flvs/foo.flv     -->
+		<!-- origin1/data/ will be resolved into origin1/data/c/ams/flvs/foo.flv         -->
+		<!--                                                                             -->
+		<!-- By default, type is set to "path" and the prefix is set to ?IP?. The IP in  -->
+		<!-- the prefix can be used to avoid file collision.  For example, the proxy     -->
+		<!-- server might be connecting to two different origin servers with the same    -->
+		<!-- file in c:\data\foo.flv.  And you want to keep the cache files separate in  -->
+		<!-- the proxy server.  Similarly, if you want to share the cache file among     -->
+		<!-- origin servers, you should not include the IP as parameter.                 -->
+		<!-- Remember this prefix is a relative path used by proxy server to lookup the  -->
+		<!-- cache stream file.  The prefix can be any name except some special          -->
+		<!-- characters such as \, :, *, ?, ", <, >, |.                                  -->
+		<CachePrefix type="path">?IP?</CachePrefix>
+
+		<!-- Specifies the interval for updating the cache streaming in the proxy        -->
+		<!-- server.  Value is in millisecond.  Minimum = 10 sec, maximum = 24 hours,    -->
+		<!-- default = 10 min.                                                           -->
+		<CacheUpdateInterval></CacheUpdateInterval>
+
+		<!-- Specifies the interval for gc'ing the stream meta.                          -->
+		<!-- Value is in minute.  Minimum = AppInstanceGC found in Vhost.xml,            -->
+		<!-- default = 24 hours.                                                         -->
+		<StreamMetaGCInterval></StreamMetaGCInterval>
+
+		<MaxBufferRetries>128</MaxBufferRetries>
+		<ThrottleBoundaryRequest enable="false">8</ThrottleBoundaryRequest>
+		<ThrottleLoads enable="true">8</ThrottleLoads>
+		<ThrottleDisplayInterval>64</ThrottleDisplayInterval>
+
+		<!-- If there is no key frame at the point of seek server will perform     -->
+		<!-- accurate seeking based on the nearest key and intermediate frames.    -->
+		<!-- Default = true. The zone attribute can be set to "client", "server".  -->
+		<!-- If zone is set to "client", no keyframe will be generated in the      -->
+		<!-- the server, but all the information for accurate seeking will passed  -->
+		<!-- and processed on the client side.                                     -->
+		<!-- If zone is set to "server", a new keyframe will be created on the     -->
+		<!-- server side based on the previous keyframe and intermediate frames.   -->
+		<!-- If the zone attribute is missing, server will fall back to the old    -->
+		<!-- behavior where enhanced seeking will be handled by the server for     -->
+		<!-- Sorenson codec.  For the other video codec, enhanced will be handled  -->
+		<!-- by the client.                                                        -->
+		<EnhancedSeek zone="client">true</EnhancedSeek>
+
+		<!-- Specifies the interval for saving generated keyframes in an .flv file  -->
+		<!-- Value is in milliseconds.  Default = 60000 millisecond.  Minimum = 0   -->
+		<!-- millisecond and maximum = 24 hours.  If value is unspecified or out of -->
+		<!-- the range, it is set to 1000 millisecond.                              -->
+		<KeyFrameInterval>60000</KeyFrameInterval>
+		<!-- Force a GC if stream list grows over the specified value  -->
+		<!-- Default = 100. Will be GC'd during application GC         -->
+		<!-- interval.  If value is unspecified or -1, it means        -->
+		<!-- unlimited.                                                -->
+		<MaxStreamsBeforeGC>100</MaxStreamsBeforeGC>
+
+		<Audio>
+			<CombineSamples>
+				<!-- Combine samples if there are more than N subscribers.  -->
+				<Subscribers>8</Subscribers>
+
+				<!-- Stop combining samples if cpu is lower than this.      -->
+				<LoCPU>60</LoCPU>
+
+				<!-- Start combining samples if cpu is more than this.      -->
+				<HiCPU>80</HiCPU>
+
+				<!-- Combine N audio samples into one message.  Zero means  -->
+				<!-- that audio is never collapsed.  Default is 0.          -->
+				<MaxSamples>0</MaxSamples>
+			</CombineSamples>
+			<SendSilence>
+				<!-- Specifies the interval (in milliseconds) for sending silence message -->
+				<!-- when no audio is publishing to a live stream. Default is 3 second    -->
+				<!-- Set to 0 to disable the silence message                              -->
+				<!-- Silence message is used to support older version of Flash players.   -->
+				<!-- The server will only send the silence message to clients which are   -->
+				<!-- specified in <UserAgent> inside the <Client> section.  And bit 0x01  -->
+				<!-- is used to control the silence message.                              -->
+				<Interval></Interval>
+			</SendSilence>
+			<NotifyAudioStop enabled="false">
+				<!-- Specifies how long to wait before the server notifies the client     -->
+				<!-- when audio stops in the middle of a live/recorded stream.            -->
+				<!-- Default is 3 second and minimum is 1 second.                         -->
+				<Duration></Duration>
+			</NotifyAudioStop>
+		</Audio>
+
+		<Live>
+			<AccumulatedIFrames>
+				<!-- Specifies the maximum duration (in second) of intermediate frames a  -->
+				<!-- live stream can hold in the buffer.  The buffer contains a history   -->
+				<!-- of the video messages up to the last keyframe so that clients are    -->
+				<!-- able to catch up to the latest message even when they join in        -->
+				<!-- between keyframes.  If the duration in the buffer is bigger than     -->
+				<!-- MaxTime, server will clear the messages.  This setting is to avoid   -->
+				<!-- the buffer from getting too big in the server and should be set      -->
+				<!-- bigger than the keyframe interval.  Default value is set to -1 which -->
+				<!-- means unlimited.                                                     -->
+				<MaxTime>-1</MaxTime>
+				<!-- Specifies the maximum size (in kilobytes) of intermediate frames a   -->
+				<!-- live stream can hold in the buffer.  The buffer contains a history   -->
+				<!-- of the video messages up to the last keyframe so that clients are    -->
+				<!-- able to catch up to the latest message even when they join in        -->
+				<!-- between keyframes.  If the size in the buffer is bigger than         -->
+				<!-- MaxSize, server will clear the messages.  This setting is to avoid   -->
+				<!-- the buffer from getting too big in the server and should be set      -->
+				<!-- bigger than the total size of intermediate frame between keyframes.  -->
+				<!-- Default value is set to -1 which means unlimited.                    -->
+				<MaxSize>-1</MaxSize>
+			</AccumulatedIFrames>
+			<!-- A message queue is used to buffer the incoming messages from the publisher   -->
+			<!-- so that the server can send messages in chunks to the subscribers.  Queuing  -->
+			<!-- can be disabled so that individual messages will be sent out immediately to  -->
+			<!-- the subscribers.  The "enabled" attribute can be set to "false" to disable   -->
+			<!-- queuing.                                                                     -->
+			<Queue enabled="true">
+				<!-- Specifies how often the server will flush the message queue by size   -->
+				<!-- (in bytes).   Set value to 0 also disable queuing.  Default is 4096.  -->
+				<MaxQueueSize>4096</MaxQueueSize>
+				<!-- Specifies how often the server will flush the message queue by time   -->
+				<!-- (in milliseconds).   The default value is set to 500 milliseconds.    -->
+				<MaxQueueDelay>500</MaxQueueDelay>
+				<!-- Specifies whether the server will flush the message queue when a      -->
+				<!-- data message arrives.  This is important when streaming only data     -->
+				<!-- messages, so the server will send out the messages immediately.       -->
+				<!-- Default is set to true.                                               -->
+				<FlushOnData>true</FlushOnData>
+				<!-- When queuing is enabled, messages in the queue can be combined to     -->
+				<!-- form aggregate messages.  The "enabled" attribute will determine      -->
+				<!-- whether aggregate messages will be created.  Default is "true".       -->
+				<AggregateMessages enabled="true">
+					<!-- This setting determines the maximum size (in bytes) of  -->
+					<!-- aggregate messages created from the message queue when  -->
+					<!-- when aggregate messages are enabled.  Default is -1,    -->
+					<!-- which means that the aggregates can be as large as the  -->
+					<!-- queue size allows.                                      -->
+					<MaxAggMsgSize>-1</MaxAggMsgSize>
+
+					<!-- Maximum Duration in Millisconds of an aggregate message while -->
+					<!-- reading from livestream. Default is 10000 Millisconds. -->
+					<!-- <MaxAggMsgDuration>10000</MaxAggMsgDuration >		-->
+				</AggregateMessages>
+			</Queue>
+			<!-- Ping the existing publisher if another client tries to publish to the -->
+			<!-- same live stream.  The value specifies how long (in milliseconds)     -->
+			<!-- the server expects a response from the existing publisher.  If the    -->
+			<!-- publisher fails to response within the timeout.  The server will      -->
+			<!-- allow the second publisher to take over the live stream.  Default is  -->
+			<!-- 2000 milliseconds.  And set value to -1 to disable ping.              -->
+			<PublishTimeout>2000</PublishTimeout>
+			<!-- This specifies the max latency (in milliseconds)of incoming messages  -->
+			<!-- in a live stream.  When a data message is injected to a live stream   -->
+			<!-- through the server side script, the max latency is used to determine  -->
+			<!-- the timestamp of the message.  If the injection time is bigger than   -->
+			<!-- the maximum latency, the time difference between the last message     -->
+			<!-- time and the injection time will be added to the timestamp of the     -->
+			<!-- data message.  Otherwise the last message time will be used.  Default -->
+			<!-- is 500, and minimum is 0.                                             -->
+			<MaxLatency>500</MaxLatency>
+			<!-- When this is enabled, the server will start the stream timeline of a -->
+			<!-- live stream as soon as it is published. This means that any delay    -->
+            <!-- publish time and the time the first message arrives will be added to -->
+            <!-- stream time as a fixed offset. This is useful if the publisher wishes-->
+            <!-- to wait before sending messgages on a published stream, and wants    -->
+			<!-- that delay to be accounted for in the stream timeline. This should   -->
+			<!-- not be enabled when using DynamicStreaming to switch between live    -->
+			<!-- streams, since this can cause the streasm to be appear out of sync.  -->
+			<StartClockOnPublish>false</StartClockOnPublish>
+			<!-- When this is disabled, the server will not erase any previously      -->
+			<!-- recorded stream when a new publisher arrives in live mode.  By       -->
+			<!-- default, this is enabled and the recorded stream will be erased.     -->
+			<EraseOnPublish>true</EraseOnPublish>
+			<!-- When enabled, the server will assume that incoming live streams have -->
+                        <!-- timestamps that are based on an absolute clock, such as a SMPTE time -->
+                        <!-- signal contained within the encoder's input source.                  -->
+                        <!-- Default is false.                                                    -->
+            <AssumeAbsoluteTime>false</AssumeAbsoluteTime>
+			<!-- When enabled, AMS will process the video packets for closed caption and       -->
+			<!-- generate onCaptionInfo message to be sent to the client. 					-->
+			<GenerateCCInfo>false</GenerateCCInfo>
+
+		</Live>
+
+		<!-- Whether we send status message NetStream.Play.Start for all the commands     -->
+		<!-- including play, seek and unpause.  If false, only the play command will get  -->
+		<!-- the status message                                                           -->
+		<SendDuplicateStart>true</SendDuplicateStart>
+
+		<!-- Controls commands we send OnMetaData with.  The value can be set to true,    -->
+		<!-- false, or once.  These values determines when the onMetaData message is      -->
+		<!-- sent, in the following manner,                                               -->
+		<!--                                                                              -->
+		<!--     true     Sends onMetaData for play and seek commands.                    -->
+		<!--     false    Sends onMetaData for play only.                                 -->
+		<!--     once     Falls back to AMS 1.x behavior, sends onMetaData based on the   -->
+		<!--              start position regardless of the command.  If no onMetaData is  -->
+		<!--              found from the start position, no onMetaData will be sent.      -->
+		<!-- By default, the value is set to true.                                        -->
+		<SendDuplicateOnMetaData>true</SendDuplicateOnMetaData>
+		<Recording>
+			<!-- The default maximum size (in KB) of a recorded file.    -->
+			<!-- recording completely. -1 means that no maximum size is to be enforced. Default is -1. -->
+			<MaxSize>-1</MaxSize>
+			<!-- Sets a cap on the maximum size (in KB) of a recorded file.        -->
+			<!-- Values set using the MaxSize field or SSAS will not be allowed to exceed this value.-->
+			<!-- 0 disables recording completely. -1 means that no size cap is to be enforced. -->
+			<!-- Default is -1. -->
+			<MaxSizeCap>-1</MaxSizeCap>
+			<!-- The default maximum duration (in seconds) of a recorded file.          -->
+			<!-- 0 disables recording completely. -1 means that no maximum duration is to be enforced. -->
+			<!-- Default is -1. -->
+			<MaxDuration>-1</MaxDuration>
+			<!-- Sets a cap on the maximum duration (in seconds) of a recorded file.    -->
+			<!-- Values set using the MaxDuration field or SSAS will not be allowed to exceed this value.-->
+			<!-- 0 disables recording completely. -1 means that no size cap is to be enforced. -->
+			<!-- Default is -1. -->
+			<MaxDurationCap>-1</MaxDurationCap>
+
+		  </Recording>
+
+	    	  <!-- Determines whether non-key video frames that arrive without a    -->
+		  <!-- corresponding video key frame are filter or sent downstream to   -->
+		  <!-- the destination client, server, or recording stream.             -->
+		  <!-- When false, it is assumed that the downstream receiver is able   -->
+		  <!-- to handle the extra non-key frames by dropping them, etc.        -->
+		  <!-- Default is false, meaning the non-key frames are not filtered.   -->
+		  <FilterNonKeyFrames>false</FilterNonKeyFrames>
+	</StreamManager>
+
+	<SharedObjManager>
+		<!-- Specifies the physical location where shared objects are stored -->
+		<!-- on the server.                                                  -->
+		<!-- For example, <StorageDir>c:\myapp\sharedobjects\</StorageDir>   -->
+		<StorageDir></StorageDir>
+
+		<!-- Specifies the physical location where shared objects are duplicated   	-->
+		<!-- This location serves as a backup for SharedObject files           		-->
+		<!-- This location must already exist, and when a shared object			-->
+		<!-- is copied here, it will be categorized by instance name by default		-->
+		<!-- To include application name in the file path created the tag		-->
+		<!-- change the appName attribute to "true", if not "false"			-->
+		<!-- Example<DuplicateDir appName="true">c:\backupSharedObjects</DuplicateDir>	-->
+		<DuplicateDir appName="true"></DuplicateDir>
+
+		<!-- Deleted slots will be purged if the current version - deleted version is greater -->
+		<!-- than the value specified.  -->
+		<ResyncDepth>-1</ResyncDepth>
+
+		<!-- Specifies the timeout value in seconds to automatically unlock -->
+		<!-- sharedobject if there is a client waiting for update. -1 to wait for ever. -->
+		<LockTimeOut>-1</LockTimeOut>
+
+		<!-- SharedObjects are automatically commited if they are dirty, this can be disabled -->
+		<!-- for all shared objects within this instance by specifying false. SASS will have to call-->
+		<!-- "save" or SharedObject.commit to persist the shared object else all data will be lost when the app shuts down-->
+		<AutoCommit>true</AutoCommit>
+
+		<!-- Maximum properties that can be set per shared object -->
+		<!-- -1 is unlimited.  -->
+		<MaxProperties>-1</MaxProperties>
+		<!-- Each property within each shared object cannot exceed value specified in bytes. -->
+		<!-- -1 is unlimited.  -->
+		<MaxPropertySize>-1</MaxPropertySize>
+
+	</SharedObjManager>
+
+	<!-- Specifies whether or not to allow tunneling connections into this   -->
+	<!-- application. The acceptable values are true, false, http1.1only and -->
+	<!-- keepalive. The following describes the effect of each value,        -->
+	<!--    true		allow all tunneling connections                      -->
+	<!--    false       disallow all tunneling connections                   -->
+	<!--    http1.1only allow only http 1.1 connections                      -->
+	<!--    keepalive   allow http 1.1 or http 1.0 keep alive connections    -->
+	<AllowHTTPTunnel>true</AllowHTTPTunnel>
+
+	<Client>
+		<!-- Use 10 if you have bandwidth values for AMS 2, 2 otherwise. -->
+		<WindowsPerAck>2</WindowsPerAck>
+		<Bandwidth override="yes">
+			<!-- Specified in bytes/sec. The default provides about 20Mbps. -->
+			<ServerToClient>2500000</ServerToClient>
+			<!-- Specified in bytes/sec -->
+			<ClientToServer>2500000</ClientToServer>
+		</Bandwidth>
+		<!-- Bandwidth cannot be set higher than the value set here. -->
+		<BandwidthCap override="no">
+			<!-- Specified in bytes/sec -->
+			<ServerToClient>5000000</ServerToClient>
+			<!-- Specified in bytes/sec -->
+			<ClientToServer>5000000</ClientToServer>
+		</BandwidthCap>
+    <!-- Configure downstream (server to client) bw detection. -->
+    <!-- To disable native bw detection and use script-based   -->
+    <!-- bw detection, set the enabled attribute to false. By  -->
+    <!-- default, native bw detection is enabled.              -->
+    <BandwidthDetection enabled="true">
+      <!-- Don't send data to client greater than this rate (in Kbps). -->
+      <!-- Default of -1 means don't need to throttle; just send the   -->
+      <!-- data at whatever rate is necessary to measure bw.           -->
+      <MaxRate>-1</MaxRate>
+      <!-- Amount of data sent to client. Server sends a series of random bytes -->
+      <!-- to the client, each time sending this much more data. For example,   -->
+      <!-- x bytes are sent, followed by 2x bytes, followed by 3x bytes, etc.   -->
+      <!-- until <MaxWait> time has elapsed.                                    -->
+      <DataSize>16384</DataSize>
+      <!-- Specifies how long (in sec.) server will send data to the client.    -->
+      <MaxWait>2</MaxWait>
+    </BandwidthDetection>
+		<MsgQueue>
+			<Live>
+				<!-- Drop live audio if audio q exceeds time specified. time in milliseconds -->
+				<MaxAudioLatency>2000</MaxAudioLatency>
+				<!-- Default buffer length in millisecond for live audio and video queue. -->
+				<MinBufferTime>8000</MinBufferTime>
+			</Live>
+			<Recorded>
+				<!-- Default buffer length in millisecond for live audio and video, value cannot be set below this by Flash player. -->
+				<MinBufferTime>2000</MinBufferTime>
+			</Recorded>
+			<Server>
+				<!-- Ratio of the buffer length used by server side stream -->
+				<!-- to live buffer.  The value is between 0 and 1.  To    -->
+				<!-- avoid break up of audio, the ratio should not be more -->
+				<!-- than 0.5 of the live buffer.                          -->
+				<BufferRatio>0.5</BufferRatio>
+				<!-- This specifies whether outgoing messages are sent in       -->
+				<!-- different priorities for server to server connection.  By  -->
+				<!-- default, prioritization is set to false which means        -->
+				<!-- messages are sent out through one channel with the same    -->
+				<!-- priority.  If the value is set to true, messages will be   -->
+				<!-- sent through multiple channels with different priorities.  -->
+				<!-- And the priority is based on the message type.             -->
+				<Prioritization>false</Prioritization>
+				<!-- The minimum number of video messages to queue at the start -->
+				<!-- of a stream.  When an H264 stream or other pipelined codec -->
+				<!-- stream begins it needs some number of messages, at most 64 -->
+				<!-- to begin playback and this setting ensures that regardless -->
+				<!-- of the buffer set there are enough messages at the start   -->
+				<!-- to begin playback quickly.  Making this less than 64, down -->
+				<!-- to 0 won't queue up extra messages but may cause H264      -->
+				<!-- content with a low FramesPerSecond to delay before start   -->
+				<MinQueuedVideo>64</MinQueuedVideo>
+			</Server>
+			<Diagnostic>
+				<!-- Whether diagnostic logging specific to message queue is    -->
+				<!-- enabled.  Default is false.                                -->
+				<Enable>false</Enable>
+			</Diagnostic>
+		</MsgQueue>
+		<HTTPTunnel>
+			<!-- The following two parameters affect the latency observed by -->
+			<!-- a client tunneling into the server. Low values will reduce  -->
+			<!-- the latency but increase the network bandwidth overhead.    -->
+			<!-- Applications desiring low latency may use 128/256 for idle  -->
+			<!-- post and ack intervals, while those not susceptible to high -->
+			<!-- latencies may use 1024/2048. The default setting provides   -->
+			<!-- medium latency and is set at 512/512.                       -->
+
+			<!-- This specifies the interval at which the client should send -->
+			<!-- idle posts to the server to indicate that the player has no -->
+			<!-- data to send. This is needed to enable the server to send   -->
+			<!-- downstream data. This interval is specified in milliseconds -->
+			<!-- and must be in the range 0 to 4064 msec.                    -->
+			<IdlePostInterval>512</IdlePostInterval>
+
+			<!-- This specifies the max time the server may wait before it   -->
+			<!-- sends back an ack for a client idle post.                   -->
+			<IdleAckInterval>512</IdleAckInterval>
+
+			<!-- This specifies the default mime type header sent on tunnel  -->
+			<!-- responses. In general the server always uses the mime type  -->
+			<!-- specified by the incoming requests. The server will use the -->
+			<!-- following only if it could not determine the mime type from -->
+			<!-- incoming requests.                                          -->
+			<MimeType>application/x-fcs</MimeType>
+
+			<!-- This specifies the size (in KB) of the write buffer. The    -->
+			<!-- default is 16Kb.                                            -->
+			<WriteBufferSize>16</WriteBufferSize>
+
+		</HTTPTunnel>
+
+		<!-- This specifies the max size of messages for screen-sharing      -->
+		<!-- video packets.  Messages larger than this limit will be broken  -->
+		<!-- into multiple messages, which can allow for updates to appear   -->
+		<!-- faster but also creates partial image updates.  The size is     -->
+		<!-- bytes.  Set to zero for to not alter screen-sharing messages    -->
+		<MaxMessageSizeLosslessVideo>0</MaxMessageSizeLosslessVideo>
+
+		<!-- Specifies the RTMP chunk size to use in all streams for this	-->
+		<!-- application.  Stream content breaks into chunks of this size	-->
+		<!-- in bytes.  Larger values reduce CPU usage, but also commit to	-->
+		<!-- larger writes that can delay other content on lower bandwidth	-->
+		<!-- connections.  This can have a minimum value of 128 (bytes) and	-->
+		<!-- a maximum value of 65536 (bytes) with a default of 4096 bytes	-->
+		<!-- Note that older clients may not support chunk sizes largee than	-->
+		<!-- 1024 bytes. If the chunk setting is larger than these clients can	-->
+		<!-- support, the chunk setting will be capped at 1024 bytes.		-->
+		<OutChunkSize>4096</OutChunkSize>
+
+		<!-- An application can be configured to deliver aggregate messages to       -->
+		<!-- clients that support them by setting the "enabled" attribute to "true". -->
+		<!-- The server will attempt to send aggregate messages to these supported   -->
+		<!-- clients based whenever possible.                                        -->
+		<!-- When this setting is disabled, aggregate messages will always be broken -->
+		<!-- up into individual messages before being delivered to clients.          -->
+		<!--  The default is "true".				                     -->
+		<AggregateMessages enabled="true"></AggregateMessages>
+
+
+		<!-- Controls libconnect.dll access configurations			 -->
+		<Access>
+			<!-- This controls if readAccess and writeAccess use the format  -->
+			<!-- where folder level permissions are enforced		 -->
+			<!-- if true, individual files cannot be marked specifically for -->
+			<!-- read or write access. Default is false, new format allows   -->
+			<!-- access control at the file level				 -->
+			<FolderAccess>false</FolderAccess>
+			<!-- This tag specifies a semicolon delimited list of folder     -->
+			<!-- levels which are given with audio sample access.  By        -->
+			<!-- default, this tag is disabled and the value is empty which  -->
+			<!-- means no one will have audio access.  This tag can be       -->
+			<!-- enabled by setting "enabled" to "true".                     -->
+			<!-- When enabled, everyone have audio sample access to the      -->
+			<!-- access folders specified in the list.  If value is set to   -->
+			<!-- to "/", full sample access will be granted.  User can also  -->
+			<!-- override this setting by using the access adaptor or server -->
+			<!-- side script.                                                -->
+			<AudioSampleAccess enabled="false"></AudioSampleAccess>
+			<!-- This tag specifies a semicolon delimited list of folder     -->
+			<!-- levels which are given with video sample access.  By        -->
+			<!-- default, this tag is disabled and the value is empty which  -->
+			<!-- means no one will have video access.  This tag can be       -->
+			<!-- enabled by setting "enabled" to "true".                     -->
+			<!-- When enabled, everyone have video sample access to the      -->
+			<!-- access folders specified in the list.  If value is set to   -->
+			<!-- to "/", full sample access will be granted.  User can also  -->
+			<!-- override this setting by using the access adaptor or server -->
+			<!-- side script.                                                -->
+			<VideoSampleAccess enabled="false"></VideoSampleAccess>
+		</Access>
+
+		<!-- Bit 0x01 represents clients will get the silence message if the -->
+		<!-- client falls within the range specified.                        -->
+		<UserAgent override="yes">
+			<Bits from="WIN 6,0,0,0" to="WIN 7,0,55,0">0x01</Bits>
+			<Bits from="MAC 6,0,0,0" to="MAC 7,0,55,0">0x01</Bits>
+		</UserAgent>
+	</Client>
+
+	<Debug>
+		<!-- This specifies the max number of pending debug connections.     -->
+		<!-- This is by default 50.  If this is 0, then debugging	         -->
+		<!-- connections are disabled.  Once this number is met, the	     -->
+		<!-- oldest pending debug connection will be rejected to make room   -->
+		<!-- This value has meaning only if application.allowDebug has been  -->
+		<!-- set to "true". The default value of application.allowDebug is   -->
+		<!-- "false". There is now no way to specify application.allowDebug  -->
+		<!-- through configuration file. However, its value can be via SSAS. -->
+		<MaxPendingDebugConnections>50</MaxPendingDebugConnections>
+	</Debug>
+
+	<HTTP>
+		<!-- Specifies whether or not to use HTTP 1.0. Default is false.     -->
+		<HTTP_1_0>false</HTTP_1_0>
+
+		<!-- Specifies whether or not to output verbose information during   -->
+		<!-- operation. This is useful for debugging.                        -->
+		<Verbose>false</Verbose>
+
+		<Connections>
+			<!-- Specifies max time (in secs.) that a transfer can take to   -->
+			<!-- complete. Default is 60 secs. Since operations such as DNS  -->
+			<!-- lookups may take some time, setting this to a low value     -->
+			<!-- runs the risk of aborting perfectly normal operations.      -->
+			<MaxTimeout>60</MaxTimeout>
+
+			<!-- Specifies whether or not to explicitly close the connection -->
+			<!-- after every transfer. Default is to reuse connections. Set  -->
+			<!-- this to false to explicitly use a new connection each time. -->
+			<Reuse>true</Reuse>
+
+			<!-- Specifies the interface name to use as the outgoing network -->
+			<!-- interface. The name can be an interface name, an IP address -->
+			<!-- or a host name.                                             -->
+			<Interface></Interface>
+		</Connections>
+
+		<Proxy>
+			<!-- Specifies the HTTP proxy to use. This can be the hostname   -->
+			<!-- a dotted IP address. To specify port number in this string, -->
+			<!-- append :[port] to the end of the host name. The port number -->
+			<!-- may optionally be specified separately in the <Port> tag.   -->
+			<Host></Host>
+
+			<!-- Specifies the proxy port to connect to if not specified as  -->
+			<!-- part of the host in <Host>.                                 -->
+			<Port></Port>
+
+			<!-- Specifies the type of proxy being connected to. This can be -->
+			<!-- This can be HTTP or SOCKS5. Default is HTTP.                -->
+			<Type>HTTP</Type>
+
+			<!-- Specifies whether or not to tunnel all operations through a -->
+			<!-- given HTTP proxy. Default is false.                         -->
+			<Tunnel>false</Tunnel>
+
+			<!-- Specifies the username to use for connecting to the proxy.  -->
+			<Username></Username>
+
+			<!-- Specifies the password to use for connecting to the proxy.  -->
+			<Password></Password>
+		</Proxy>
+
+		<Redirect>
+			<!-- Specifies whether or not to allow following any Location:   -->
+			<!-- header that is sent as part of the HTTP header. Default is  -->
+			<!-- true; allow redirects.                                      -->
+			<Allow>true</Allow>
+
+			<!-- Specifies the max number of redirects allowed.              -->
+			<Max>10</Max>
+
+			<!-- Specifies whether or not to allow sending username/password -->
+			<!-- again with each redirect. This is only useful if redirects  -->
+			<!-- are allowed as defined by <Allow>. Default is true.         -->
+			<UnrestrictedAuth>true</UnrestrictedAuth>
+		</Redirect>
+
+	</HTTP>
+
+	<!-- SWFVerification configures how a SWF connecting to this app is verified. -->
+	<!-- If enabled, all connections to this app will require verification, with  -->
+	<!-- some exceptions which is configured in <UserAgentExceptions>.            -->
+  <!-- This setup is completely independent of the Administrator level SWF      -->
+  <!-- verification that may be found in Server.xml.  When SWFVerification is   -->
+  <!-- enabled, it first looks to the settings here and only upon failure to    -->
+  <!-- verify will the independent Adminstrator level SWF Verification settings -->
+  <!-- be consulted.                                                            -->
+	<SWFVerification enabled="false">
+
+		<!-- Any SWFs found in this folder will be authenticated for connecting -->
+		<!-- to this application on this server.  You can use a semicolon to 	-->
+		<!-- seperate multiple directories here as well. For example 		-->
+		<!-- C:\apps\app1\SWFs;D:\apps\app1\SWFs will allow swfs from either	-->
+		<!-- of these two directories to connect.  SWFs located right at this 	-->
+		<!-- directory location will be allowed to connect to any application 	-->
+		<!-- instance.  Those sWFs located under an instance named folder will 	-->
+		<!-- be allowed to connect only to that specific instance.  The default -->
+		<!-- here is the application's folder appended with /SWFs - thus if my 	-->
+		<!-- application is located at C:\applications\foo1 then the default SWF-->
+		<!-- verification folder is C:\applications\foo1\SWFs			-->
+		<SWFFolder></SWFFolder>
+
+		<!-- This specifies the minimum accepted version of SWFVerification allowed by the server.	-->
+		<!-- Initial version is 1.                                                                      -->
+		<MinGoodVersion></MinGoodVersion>
+
+		<!-- This specifies the number of levels for subfolders in SWFFolder to scan  		-->
+		<!-- for SWFs files. Negative value means all existing subfolders level are scanned.   	-->
+		<!-- Default is 1 which means the only one subfolder level is scanned. 	                -->
+		<DirLevelSWFScan>1</DirLevelSWFScan>
+
+		<!-- The maximum time (sec) for processing swf files. Default value is 5 sec -->
+		<MaxInitDelay>5</MaxInitDelay>
+
+		<!-- The maximum allowable time, before disconnect, that a client may 	-->
+		<!-- take to provide its first verification hash to AMS.		-->
+		<!-- Default is 5 seconds.  Set -1 for no timeout. 			-->
+		<!-- Note: Adjusting this time lower than 5 seconds risks disconnecting	-->
+		<!-- valid users with slower connections				-->
+		<FirstHashTimeout>5</FirstHashTimeout>
+
+		<!-- The maximum allowable time, before disconnect, that a client may 	-->
+		<!-- take to provide its final verification hash to AMS.  Final hash is for -->
+		<!-- the completely downloaded SWF file.				-->
+		<!-- Default is 60 seconds.  Set -1 for no timeout.			-->
+		<!-- Note: Adjusting this time lower than 60 seconds risks disconnecting-->
+		<!-- valid users with slower connections.				-->
+		<FinalHashTimeout>60</FinalHashTimeout>
+
+		<!-- If it is necessary to allow certain types of connection to bypass	-->
+		<!-- the requirement for SWFVerification, then those types of connection	-->
+		<!-- should have their distinguishing UserAgent type added to this 	-->
+		<!-- configuration.  To add an exception to the SWFVerification rule one	-->
+		<!-- inserts an Exception block within the UserAgentExceptions tag.	-->
+		<!-- By default there are no exceptions.				-->
+		<UserAgentExceptions>
+
+			<!-- This is an example exception, UserAgents are specified in	-->
+			<!-- a range.  An empty range, such as in the example below is	-->
+			<!-- disregarded.  Ranges specify a string name and a version 	-->
+			<!-- number.  If one wanted to allow Flash Media Encoder to 	-->
+			<!-- be an exception, its UserAgent is FME/1.0 at time of this	-->
+			<!-- writing.  Thus one could specify From="FME/0.0" and      -->
+			<!-- To="FME/1.0" allowing the range FME falls into.	    	-->
+			<!-- Another example using a specific Flash Player		-->
+			<!-- will report WIN 9,0,28,0 as its UserAgent.  One may specify-->
+			<!-- From="WIN 9,0,28,0" and To="WIN 9,0,28,0" and only that	-->
+			<!-- specific version will be an exception.  One may list 	-->
+			<!-- as many exceptions as necessary, and they may overlap in 	-->
+			<!-- range as needed.  Users should take great care in allowing	-->
+			<!-- exceptions as those listed here are not verified via SWF	-->
+			<!-- verification at all.						                    -->
+			<Exception from="" to=""/>
+		</UserAgentExceptions>
+		<!-- SWFVerification data are cache in the server.  This configures how the cache behaves.  -->
+		<Cache>
+			<!-- TTL is the time to live of each SWF in the cache.  Specified in minutes.       -->
+			<!-- Default value is 1440 minutes (24 hours)                                       -->
+			<TTL>1440</TTL>
+			<!-- The maximum time to wait for the server to scan the SWF folders for updates    -->
+			<!-- when there is a miss in the cache.  Specified in minutes.  Default value is    -->
+			<!-- 5 minutes.                                                                     -->
+			<UpdateInterval>5</UpdateInterval>
+		</Cache>
+
+		<!-- Shall connections be held in a pending state, unable to execute commands on AMS	-->
+		<!-- such as plays or seeks, without first completing SWF Verification.  For most		-->
+		<!-- clients this delay will not be noticeable, but this will prevent unwanted playback	-->
+		<!-- during the timeout period for a completed SWF Verification.  In order to activate	-->
+		<!-- this configuration set enabled to "true"								-->
+		<ConnectionBlocking enabled="false"/>
+	</SWFVerification>
+	<!-- This section controls some of the logging behaviors.                      -->
+	<Logging>
+		<!-- This section controls access log.                                 -->
+		<Access>
+			<!-- You can override the settings specified in Vhost.xml for  -->
+			<!-- this application by uncommenting the tag below. You can   -->
+			<!-- disable logging checkpoints for this application, or      -->
+			<!-- change the checkpoint interval of this application.  If   -->
+			<!-- the checkpoint interval is not specified here, or invalid -->
+			<!-- (i.e. <= 0), then we use whatever was set at the vhost    -->
+			<!-- level.                                                    -->
+			<!--
+			<Checkpoints enable="false">
+				<LogInterval>3600</LogInterval>
+			</Checkpoints>
+			-->
+		</Access>
+	</Logging>
+
+	<!-- Specifes which protocols cannot be used to connect to this app. -->
+	<!-- Protocols can be rtmp, rtmps, or rtmpe.  Protocols are specified -->
+	<!-- in a comma delimited list.  Any protocol not specified is allowed. -->
+	<!-- Example, <DisallowedProtocols>rtmp,rtmps</DisallowedProtocols> -->
+	<!-- disallows rtmp and rtmps and only allows clients to connect via -->
+	<!-- rtmpe.  Default is to allow all protocols. -->
+	<DisallowedProtocols></DisallowedProtocols>
+
+	<!-- This section provides the means to control the behavior of         -->
+	<!-- application-specific RTMFP functionality.                          -->
+	<RTMFP>
+		<!-- RTMFP clients establish direct peer-to-peer connections through   -->
+		<!-- the use of NetStream DIRECT_CONNECTIONS and peerIDs, or by using  -->
+		<!-- NetGroup to join a Flash Group where clients may be automatically -->
+		<!-- bootstrapped to neighbors or may manually initiate connections to -->
+		<!-- them. The process of establishing a peer-to-peer connection       -->
+		<!-- begins with the initiating client sending a peer lookup request   -->
+		<!-- to the server. These events are processed differently depending   -->
+		<!-- upon the 'mode' attribute. Supported modes are:                   -->
+		<!--                                                                   -->
+		<!--   None (default) - All peer lookup events are handled internally  -->
+		<!--     at this AMS node without being dispatched up to script.       -->
+		<!--   Partial - Peer lookup events that target a peer known to be     -->
+		<!--     connected to this AMS node are handled internally without     -->
+		<!--     being dispatched up to script (as an optimization). If the    -->
+		<!--     target peer is not known, the event is dispatched to script   -->
+		<!--     where a distributed introduction may take place.              -->
+		<!--   All - All peer lookup events are dispatched up to script. This  -->
+		<!--     supports distributed introductions and also allows for        -->
+		<!--     application logic to selectively choose to ignore or deny     -->
+		<!--     specific lookup requests.                                     -->
+		<PeerLookupEvents mode="None"/>
+
+		<!-- Settings within the GroupControl section control server-side       -->
+		<!-- functionality corresponding to the "server channel" that clients   -->
+		<!-- within a Flash Group may open to the server. The presence of a     -->
+		<!-- server channel depends on serverChannelEnabled=true for the        -->
+		<!-- GroupSpecifier used to generate the groupspec value to join a      -->
+		<!-- Flash Group.                                                       -->
+		<GroupControl>
+			<!-- The JoinLeaveEvents element controls whether events for clients    -->
+			<!-- that join or leave a Group are dispatched to script or handled     -->
+			<!-- internally. Supported modes are:                                   -->
+			<!--   None (default) - All Group join/leave events are handled         -->
+			<!--                    internally at this AMS node.                    -->
+			<!--   All - All Group join/leave events are dispatched to script.      -->
+			<JoinLeaveEvents mode="None"/>
+		</GroupControl>
+	</RTMFP>
+	<!-- This section provides the means to control the behavior of -->
+	<!-- application-specific HTTP dynamic streaming functionality. -->
+	<HDS>
+		<!-- This section controls the behavior of HTTP live recording -->
+		<Recording>
+			<!-- The enabled attribute can be set to "true", "false" or "allow".    -->
+			<!-- Content protected is enabled when the attribute is set to "true",  -->
+			<!-- and disabled when set to "false".                                  -->
+			<!-- If enabled is set to "allow", only then Event.xml have right to    -->
+			<!-- override the ContentProtection tag completely.  And none of the    -->
+			<!-- settings inside the ContentProtection here will be used.  And if   -->
+			<!-- ContentProtection is also not specified in Event.xml, content      -->
+			<!-- protection will be disabled by default.                            -->
+			<ContentProtection enabled="allow"/>
+		</Recording>
+	</HDS>
+
+  <!-- Protected RTMP parameters. Change 'enabled' tag to "true" to enable Protected RTMP for VOD -->
+  <ProtectedRTMP enabled="false">
+    <!-- DRM Metadate update interval (minutes) -->
+    <!-- This would renew the playback expiration time stamp and SWF verification white list -->
+    <UpdateInterval>60</UpdateInterval>
+    <SWFVerification enabled="false">
+      <!-- By default, the whitelist folder is set to the application folder. -->
+      <!-- If a relative path is specified, it will be relative to the application folder. -->
+      <WhiteListFolder></WhiteListFolder>
+    </SWFVerification>
+  </ProtectedRTMP>
+
+</Application>
