@@ -5,7 +5,6 @@ import { URL } from 'url';
 import * as moment from 'moment';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as os from 'os';
 import { strtotime } from 'locutus/php/datetime';
 
 import { ams as amsConfig } from '../../config';
@@ -253,66 +252,72 @@ export async function getStats() {
 
   const statsUpdateTime = new Date();
 
-  for (const appName of apps) {
-    const app = await amsClient.getAppStats(appName);
+  await Promise.all(
+    apps.map(async (appName) => {
+      const app = await amsClient.getAppStats(appName);
 
-    if (!app) {
-      continue;
-    }
-
-    const IPs = await amsClient.getIPs(appName);
-
-    const liveStreams = await amsClient.getLiveStreams(appName);
-
-    for (const channelName of liveStreams) {
-      _.set(stats, [appName, channelName], {
-        publisher: null,
-        subscribers: [],
-      });
-
-      const liveStreamStats = await amsClient.getLiveStreamStats(appName, channelName);
-
-      if (liveStreamStats.publisher) {
-        const id = liveStreamStats.publisher.client;
-        const userStats = await amsClient.getUserStats(appName, id);
-
-        const streamObj = {
-          app: appName,
-          channel: channelName,
-          serverId: id,
-          bytes: userStats.bytes_in,
-          ip: (await amsClient.parseClientFile(path.join(appsPath, appName, 'streams', channelName))).ip,
-          protocol: userStats.protocol,
-          connectCreated: moment.unix(strtotime(userStats.connect_time)).toDate(),
-          connectUpdated: statsUpdateTime,
-        };
-
-        _.set(stats, [appName, channelName, 'publisher'], streamObj);
+      if (!app) {
+        return;
       }
 
-      if (liveStreamStats.subscribers) {
-        await Promise.all(
-          _.map(liveStreamStats.subscribers, async (subscriber) => {
-            const id = subscriber.client;
+      const IPs = await amsClient.getIPs(appName);
+
+      const liveStreams = await amsClient.getLiveStreams(appName);
+
+      await Promise.all(
+        liveStreams.map(async (channelName) => {
+          _.set(stats, [appName, channelName], {
+            publisher: null,
+            subscribers: [],
+          });
+
+          const liveStreamStats = await amsClient.getLiveStreamStats(appName, channelName);
+
+          if (liveStreamStats.publisher) {
+            const id = liveStreamStats.publisher.client;
             const userStats = await amsClient.getUserStats(appName, id);
 
-            const subscriberObj = {
+            const { ip } = await amsClient.parseClientFile(path.join(appsPath, appName, 'streams', channelName));
+
+            const streamObj = {
               app: appName,
               channel: channelName,
               serverId: id,
-              bytes: userStats.bytes_out,
-              ip: IPs[id].ip,
+              bytes: userStats.bytes_in,
+              ip,
               protocol: userStats.protocol,
-              connectCreated: moment.unix(strtotime(userStats.connect_time)),
+              connectCreated: moment.unix(strtotime(userStats.connect_time)).toDate(),
               connectUpdated: statsUpdateTime,
             };
 
-            stats[appName][channelName].subscribers.push(subscriberObj);
-          })
-        );
-      }
-    }
-  }
+            _.set(stats, [appName, channelName, 'publisher'], streamObj);
+          }
+
+          if (liveStreamStats.subscribers) {
+            await Promise.all(
+              _.map(liveStreamStats.subscribers, async (subscriber) => {
+                const id = subscriber.client;
+                const userStats = await amsClient.getUserStats(appName, id);
+
+                const subscriberObj = {
+                  app: appName,
+                  channel: channelName,
+                  serverId: id,
+                  bytes: userStats.bytes_out,
+                  ip: IPs[id].ip,
+                  protocol: userStats.protocol,
+                  connectCreated: moment.unix(strtotime(userStats.connect_time)),
+                  connectUpdated: statsUpdateTime,
+                };
+
+                stats[appName][channelName].subscribers.push(subscriberObj);
+              })
+            );
+          }
+        })
+      );
+    })
+  );
 
   return stats;
 }
