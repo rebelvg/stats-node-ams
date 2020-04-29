@@ -11,7 +11,6 @@ services:
     volumes:
       - amsdata:/opt/adobe/ams
       - ./applications:/opt/adobe/ams/applications
-      - ./conf:/opt/adobe/ams/conf
 
 volumes:
   amsdata:
