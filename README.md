@@ -24,8 +24,23 @@ yarn install
 yarn start
 ```
 
-### PM2 Support
+### Test
+
+http://localhost:8080/ams_adminConsole.htm
 
 ```
-pm2 start pm2.json
+login: admin
+password: 123456789
+```
+
+http://localhost:8080/videoPlayer/videoplayer.html?source=rtmp://localhost/live/channel&type=live
+
+```
+default adobe player
+```
+
+`./ffmpeg.sh`
+
+```
+stream to the server to test the api
 ```
