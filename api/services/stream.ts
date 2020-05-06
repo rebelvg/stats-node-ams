@@ -204,7 +204,9 @@ class AmsClient {
     let fileIDs = [];
 
     for (const clientFileName of clientFiles) {
-      fileIDs.push(this.parseClientFile(path.join(clientsFolder, clientFileName)));
+      const parsedFile = await this.parseClientFile(path.join(clientsFolder, clientFileName));
+
+      fileIDs.push(parsedFile);
     }
 
     fileIDs = _.sortBy(fileIDs, ['connectTime', 'amsId']);
@@ -213,17 +215,17 @@ class AmsClient {
 
     let apiIDs = [];
 
-    apiIDs = _.map(users, async (userId, id) => {
-      const userStats = await this.getUserStats(appName, userId);
+    await Promise.all(
+      _.map(users, async (userId, id) => {
+        const userStats = await this.getUserStats(appName, userId);
 
-      return {
-        amsId: userId,
-        connectTime: moment.unix(strtotime(userStats.connect_time)).toDate(),
-        id: id,
-      };
-    });
-
-    apiIDs = await Promise.all(apiIDs);
+        apiIDs.push({
+          amsId: userId,
+          connectTime: moment.unix(strtotime(userStats.connect_time)).toDate(),
+          id: id,
+        });
+      })
+    );
 
     apiIDs = _.sortBy(apiIDs, ['connectTime', 'id']);
 
@@ -283,7 +285,7 @@ export async function getStats() {
               app: appName,
               channel: channelName,
               serverId: id,
-              bytes: userStats.bytes_in,
+              bytes: parseInt(userStats.bytes_in),
               ip,
               protocol: userStats.protocol,
               connectCreated: moment.unix(strtotime(userStats.connect_time)).toDate(),
@@ -303,7 +305,7 @@ export async function getStats() {
                   app: appName,
                   channel: channelName,
                   serverId: id,
-                  bytes: userStats.bytes_out,
+                  bytes: parseInt(userStats.bytes_out),
                   ip: IPs[id].ip,
                   protocol: userStats.protocol,
                   connectCreated: moment.unix(strtotime(userStats.connect_time)),

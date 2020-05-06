@@ -1,9 +1,9 @@
 import { Context } from 'koa';
 
 export async function isLoggedIn(ctx: Context, next) {
-  const { user } = ctx.state;
+  const { isLoggedIn } = ctx.state;
 
-  if (!user) {
+  if (!isLoggedIn) {
     throw new Error('not_logged_in');
   }
 
