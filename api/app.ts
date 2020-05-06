@@ -3,6 +3,8 @@ import * as bodyParser from 'koa-bodyparser';
 import * as Router from 'koa-router';
 import * as koaQs from 'koa-qs';
 
+import { readToken } from './middleware/read-token';
+
 import { routes } from './routes';
 
 export const app = new Koa();
@@ -10,6 +12,7 @@ export const app = new Koa();
 koaQs(app);
 
 app.use(bodyParser({ enableTypes: ['json'] }));
+app.use(readToken);
 
 app.proxy = true;
 
