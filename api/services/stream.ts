@@ -129,7 +129,9 @@ class AmsClient {
   }
 
   async getAppStats(appName: string): Promise<IGetAppStats['data'] | boolean> {
-    const getAppStats = await this.getAmsStats<IGetAppStats>('getAppStats', [['app', appName]]);
+    const getAppStats = await this.getAmsStats<IGetAppStats>('getAppStats', [
+      ['app', appName],
+    ]);
 
     if (!getAppStats.data.cores) {
       return false;
@@ -139,7 +141,10 @@ class AmsClient {
   }
 
   async getLiveStreams(appName: string): Promise<string[]> {
-    const getLiveStreams = await this.getAmsStats<IGetLiveStreams>('getLiveStreams', [['appInst', appName]]);
+    const getLiveStreams = await this.getAmsStats<IGetLiveStreams>(
+      'getLiveStreams',
+      [['appInst', appName]],
+    );
 
     if (!getLiveStreams.data) {
       return [];
@@ -148,16 +153,25 @@ class AmsClient {
     return _.values(getLiveStreams.data);
   }
 
-  async getLiveStreamStats(appName: string, channelName: string): Promise<IGetLiveStreamStats['data']> {
-    const getLiveStreamStats = await this.getAmsStats<IGetLiveStreamStats>('getLiveStreamStats', [
-      ['appInst', appName],
-      ['stream', channelName],
-    ]);
+  async getLiveStreamStats(
+    appName: string,
+    channelName: string,
+  ): Promise<IGetLiveStreamStats['data']> {
+    const getLiveStreamStats = await this.getAmsStats<IGetLiveStreamStats>(
+      'getLiveStreamStats',
+      [
+        ['appInst', appName],
+        ['stream', channelName],
+      ],
+    );
 
     return getLiveStreamStats.data;
   }
 
-  async getUserStats(appName: string, userId: string): Promise<IGetUserStats['data']> {
+  async getUserStats(
+    appName: string,
+    userId: string,
+  ): Promise<IGetUserStats['data']> {
     const getUserStats = await this.getAmsStats<IGetUserStats>('getUserStats', [
       ['appInst', appName],
       ['userId', userId],
@@ -167,7 +181,9 @@ class AmsClient {
   }
 
   async getUsers(appName: string): Promise<string[]> {
-    const getUsers = await this.getAmsStats<IGetUsers>('getUsers', [['appInst', appName]]);
+    const getUsers = await this.getAmsStats<IGetUsers>('getUsers', [
+      ['appInst', appName],
+    ]);
 
     return _.filter(getUsers.data, (appName, key) => {
       return key !== 'name';
@@ -175,7 +191,9 @@ class AmsClient {
   }
 
   async parseClientFile(path: string) {
-    const clientFile = (await fs.promises.readFile(path, { encoding: 'UTF-8' })) as string;
+    const clientFile = (await fs.promises.readFile(path, {
+      encoding: 'UTF-8',
+    })) as string;
 
     const clientData = clientFile.split(/\r\n|\r|\n/gi);
 
@@ -204,7 +222,9 @@ class AmsClient {
     let fileIDs = [];
 
     for (const clientFileName of clientFiles) {
-      const parsedFile = await this.parseClientFile(path.join(clientsFolder, clientFileName));
+      const parsedFile = await this.parseClientFile(
+        path.join(clientsFolder, clientFileName),
+      );
 
       fileIDs.push(parsedFile);
     }
@@ -224,7 +244,7 @@ class AmsClient {
           connectTime: moment.unix(strtotime(userStats.connect_time)).toDate(),
           id: id,
         });
-      })
+      }),
     );
 
     apiIDs = _.sortBy(apiIDs, ['connectTime', 'id']);
@@ -273,22 +293,29 @@ export async function getStats() {
             subscribers: [],
           });
 
-          const liveStreamStats = await amsClient.getLiveStreamStats(appName, channelName);
+          const liveStreamStats = await amsClient.getLiveStreamStats(
+            appName,
+            channelName,
+          );
 
           if (liveStreamStats.publisher) {
             const id = liveStreamStats.publisher.client;
             const userStats = await amsClient.getUserStats(appName, id);
 
-            const { ip } = await amsClient.parseClientFile(path.join(appsPath, appName, 'streams', channelName));
+            const { ip } = await amsClient.parseClientFile(
+              path.join(appsPath, appName, 'streams', channelName),
+            );
 
             const streamObj = {
               app: appName,
               channel: channelName,
-              serverId: id,
+              connectId: id,
               bytes: parseInt(userStats.bytes_in),
               ip,
               protocol: userStats.protocol,
-              connectCreated: moment.unix(strtotime(userStats.connect_time)).toDate(),
+              connectCreated: moment
+                .unix(strtotime(userStats.connect_time))
+                .toDate(),
               connectUpdated: statsUpdateTime,
             };
 
@@ -304,21 +331,23 @@ export async function getStats() {
                 const subscriberObj = {
                   app: appName,
                   channel: channelName,
-                  serverId: id,
+                  connectId: id,
                   bytes: parseInt(userStats.bytes_out),
                   ip: IPs[id].ip,
                   protocol: userStats.protocol,
-                  connectCreated: moment.unix(strtotime(userStats.connect_time)),
+                  connectCreated: moment.unix(
+                    strtotime(userStats.connect_time),
+                  ),
                   connectUpdated: statsUpdateTime,
                 };
 
                 stats[appName][channelName].subscribers.push(subscriberObj);
-              })
+              }),
             );
           }
-        })
+        }),
       );
-    })
+    }),
   );
 
   return stats;
