@@ -7,7 +7,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { strtotime } from 'locutus/php/datetime';
 
-import { ams as amsConfig } from '../../config';
+import { AMS } from '../../config';
 
 interface IAmsResponse {
   level: string;
@@ -93,7 +93,7 @@ interface IGetUserStats extends IAmsResponse {
 
 class AmsClient {
   async getAmsStats<T>(command: string, params: string[][] = []): Promise<T> {
-    const { host, user, password } = amsConfig;
+    const { host, user, password } = AMS;
 
     const apiUrl = new URL(`${host}/admin/${command}`);
 
@@ -213,7 +213,7 @@ class AmsClient {
   }
 
   async getIPs(appName: string) {
-    const { appsPath } = amsConfig;
+    const { appsPath } = AMS;
 
     const clientsFolder = path.join(appsPath, appName, 'clients');
 
@@ -264,7 +264,7 @@ class AmsClient {
 }
 
 export async function getStats() {
-  const { appsPath } = amsConfig;
+  const { appsPath } = AMS;
 
   const amsClient = new AmsClient();
 

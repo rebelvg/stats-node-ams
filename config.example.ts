@@ -1,9 +1,9 @@
-export const server = {
-  host: 'localhost',
+export const SERVER = {
   port: 3000,
   token: null,
 };
-export const ams = {
+
+export const AMS = {
   appsPath: './applications',
   host: 'http://localhost:1111',
   user: 'admin',

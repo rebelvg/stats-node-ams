@@ -1,6 +1,6 @@
 import { Next } from 'koa';
 import * as Router from 'koa-router';
-import { server } from '../../config';
+import { SERVER } from '../../config';
 
 declare module 'koa' {
   interface Context {
@@ -23,7 +23,7 @@ declare module 'koa-router' {
 export async function readToken(ctx: Router.IRouterContext, next: Next) {
   const token = ctx.get('token');
 
-  ctx.state.isLoggedIn = server.token === token;
+  ctx.state.isLoggedIn = SERVER.token === token;
 
   await next();
 }

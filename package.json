@@ -6,7 +6,7 @@
     "lint": "prettier \"**/*\" --list-different --ignore-unknown",
     "lint:fix": "prettier \"**/*\" --write --ignore-unknown",
     "docker": "docker-compose up -d && yarn setup:ams",
-    "start": "ts-node api/index.ts",
+    "start": "ts-node src/index.ts",
     "setup:ams": "docker cp ./init-ams.sh ams:/opt/adobe && docker exec ams /opt/adobe/init-ams.sh"
   },
   "devDependencies": {

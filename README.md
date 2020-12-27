@@ -2,7 +2,7 @@
 
 ## Overview
 
-Statistics server/API counterpart for stats-node specifically designed for Adobe Media Server. Comes with action script application that manages channels, streamers, clients and allows API to collect IPs.
+Statistics server/api counterpart for stats-node specifically designed for Adobe Media Server. Comes with action script application that manages channels, streamers, clients and allows API to collect IPs.
 
 ### Requirements
 

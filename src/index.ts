@@ -1,11 +1,11 @@
 import { app } from './app';
 
-import { server as serverConfig } from '../config';
+import { SERVER } from '../config';
 
 process.on('unhandledRejection', (reason, p) => {
   throw reason;
 });
 
-export const server = app.listen(serverConfig.port, serverConfig.host, () => {
+export const server = app.listen(SERVER.port, () => {
   console.log('server is running...');
 });
