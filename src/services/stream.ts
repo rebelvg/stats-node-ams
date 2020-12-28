@@ -270,7 +270,7 @@ export async function getStats() {
 
   const apps = await amsClient.getApps();
 
-  const stats = {};
+  const stats = [];
 
   const statsUpdateTime = new Date();
 
@@ -282,16 +282,22 @@ export async function getStats() {
         return;
       }
 
+      const liveApp = {
+        app: appName,
+        channels: [],
+      };
+
       const IPs = await amsClient.getIPs(appName);
 
       const liveStreams = await amsClient.getLiveStreams(appName);
 
       await Promise.all(
         liveStreams.map(async (channelName) => {
-          _.set(stats, [appName, channelName], {
+          const liveChannel = {
+            channel: channelName,
             publisher: null,
             subscribers: [],
-          });
+          };
 
           const liveStreamStats = await amsClient.getLiveStreamStats(
             appName,
@@ -310,16 +316,16 @@ export async function getStats() {
               app: appName,
               channel: channelName,
               connectId: id,
-              bytes: parseInt(userStats.bytes_in),
-              ip,
-              protocol: userStats.protocol,
               connectCreated: moment
                 .unix(strtotime(userStats.connect_time))
                 .toDate(),
               connectUpdated: statsUpdateTime,
+              bytes: parseInt(userStats.bytes_in),
+              ip,
+              protocol: userStats.protocol,
             };
 
-            _.set(stats, [appName, channelName, 'publisher'], streamObj);
+            liveChannel.publisher = streamObj;
           }
 
           if (liveStreamStats.subscribers) {
@@ -332,21 +338,25 @@ export async function getStats() {
                   app: appName,
                   channel: channelName,
                   connectId: id,
-                  bytes: parseInt(userStats.bytes_out),
-                  ip: IPs[id].ip,
-                  protocol: userStats.protocol,
                   connectCreated: moment.unix(
                     strtotime(userStats.connect_time),
                   ),
                   connectUpdated: statsUpdateTime,
+                  bytes: parseInt(userStats.bytes_out),
+                  ip: IPs[id].ip,
+                  protocol: userStats.protocol,
                 };
 
-                stats[appName][channelName].subscribers.push(subscriberObj);
+                liveChannel.subscribers.push(subscriberObj);
               }),
             );
           }
+
+          liveApp.channels.push(liveChannel);
         }),
       );
+
+      stats.push(liveApp);
     }),
   );
 
