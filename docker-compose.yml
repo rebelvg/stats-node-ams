@@ -1,16 +1,16 @@
 version: '3.7'
 
 services:
-  ams:
-    image: flexconstructor/docker-adobe-media-server
-    container_name: ams
+  adobe_media_server:
+    build: ./docker/
+    container_name: adobe_media_server
     ports:
       - 1935:1935
       - 1111:1111
       - 8080:80
     volumes:
-      - amsdata:/opt/adobe/ams
+      - adobe_media_server:/opt/adobe/ams
       - ./applications:/opt/adobe/ams/applications
 
 volumes:
-  amsdata:
+  adobe_media_server:

@@ -5,9 +5,8 @@
   "scripts": {
     "lint": "prettier \"**/*\" --list-different --ignore-unknown",
     "lint:fix": "prettier \"**/*\" --write --ignore-unknown",
-    "docker": "docker-compose up -d && yarn setup:ams",
-    "start": "ts-node src/index.ts",
-    "setup:ams": "docker cp ./init-ams.sh ams:/opt/adobe && docker exec ams /opt/adobe/init-ams.sh"
+    "docker": "docker-compose up -d",
+    "start": "ts-node src/index.ts"
   },
   "devDependencies": {
     "@types/koa": "^2.0.48",

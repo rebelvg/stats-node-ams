@@ -23,7 +23,11 @@ declare module 'koa-router' {
 export async function readToken(ctx: Router.IRouterContext, next: Next) {
   const token = ctx.get('token');
 
-  ctx.state.isLoggedIn = SERVER.token === token;
+  if (!SERVER.token) {
+    ctx.state.isLoggedIn = true;
+  } else {
+    ctx.state.isLoggedIn = SERVER.token === token;
+  }
 
   await next();
 }

@@ -6,7 +6,7 @@ Statistics server/api counterpart for stats-node specifically designed for Adobe
 
 ### Requirements
 
-- Node.js >= 8
+- Node.js LTS
 - Yarn
 
 ### Links
@@ -33,14 +33,19 @@ login: admin
 password: 123456789
 ```
 
-http://localhost:8080/videoPlayer/videoplayer.html?source=rtmp://localhost/live/channel&type=live
-
-```
-default adobe player
-```
-
-`./ffmpeg.sh`
-
 ```
 stream to the server to test the api
+
+
+./stream.sh
+```
+
+```
+subscribe by running
+
+streamlink "rtmp://localhost/live/channel live=1" best
+
+or by opening the default adobe player (requires flash)
+
+http://localhost:8080/videoPlayer/videoplayer.html?source=rtmp://localhost/live/channel&type=live
 ```
