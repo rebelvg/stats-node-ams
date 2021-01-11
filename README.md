@@ -36,7 +36,6 @@ password: 123456789
 ```
 stream to the server to test the api
 
-
 ./stream.sh
 ```
 
