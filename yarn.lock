@@ -300,6 +300,11 @@ error-inject@^1.0.0:
   resolved "https://registry.yarnpkg.com/error-inject/-/error-inject-1.0.0.tgz#e2b3d91b54aed672f309d950d154850fa11d4f37"
   integrity sha1-4rPZG1Su1nLzCdlQ0VSFD6EdTzc=
 
+es6-promise@^4.2.5:
+  version "4.2.8"
+  resolved "https://registry.yarnpkg.com/es6-promise/-/es6-promise-4.2.8.tgz#4eb21594c972bc40553d276e510539143db53e0a"
+  integrity sha512-HJDGx5daxeIvxdBxvG2cb9g4tEvwIk3i8+nhX0yGrYmZUzbkdg8QbDevheDB8gd0//uPj4c1EQua8Q+MViT0/w==
+
 escape-html@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/escape-html/-/escape-html-1.0.3.tgz#0258eae4d3d0c0974de1c169188ef0051d1d1988"
@@ -448,10 +453,12 @@ koa@^2.6.2:
     type-is "^1.6.16"
     vary "^1.1.2"
 
-locutus@2.0.9:
-  version "2.0.9"
-  resolved "https://registry.yarnpkg.com/locutus/-/locutus-2.0.9.tgz#e265af1e85fd19173e74386373888560783a02fc"
-  integrity sha1-4mWvHoX9GRc+dDhjc4iFYHg6Avw=
+locutus@2.0.12:
+  version "2.0.12"
+  resolved "https://registry.yarnpkg.com/locutus/-/locutus-2.0.12.tgz#0d41fecbd23bc58c4bcde9cd12c00c4b17107dce"
+  integrity sha512-wnzhY9xOdDb2djr17kQhTh9oZgEfp78zI27KRRiiV1GnPXWA2xfVODbpH3QgpIuUMLupM02+6X/rJXvktTpnoA==
+  dependencies:
+    es6-promise "^4.2.5"
 
 lodash@^4.17.20:
   version "4.17.20"
