@@ -28,7 +28,7 @@
     "koa-router": "^7.4.0",
     "locutus": "2.0.9",
     "lodash": "^4.17.20",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "prettier": "^2.2.1",
     "xml2js": "^0.4.23"
   }
